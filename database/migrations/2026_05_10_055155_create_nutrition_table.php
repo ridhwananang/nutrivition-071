@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('nutrition', function (Blueprint $table) {
+            $table->id();
+            $table->string('brand');
+            $table->string('item');
+            $table->string('key')->unique();
+            $table->string('serving_size');
+            $table->decimal('calories', 8, 2);
+            $table->decimal('fat', 8, 2);
+            $table->decimal('carbs', 8, 2);
+            $table->decimal('protein', 8, 2);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('nutrition');
+    }
+};
