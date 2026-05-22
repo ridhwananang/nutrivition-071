@@ -20,5 +20,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
             'password' => 'Password123!',
         ]);
+
+        $this->call([
+            NutritionSeeder::class,
+        ]);
     }
 }

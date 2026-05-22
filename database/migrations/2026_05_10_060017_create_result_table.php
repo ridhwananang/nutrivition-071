@@ -17,6 +17,10 @@ return new class extends Migration {
             $table->string('scan_image');
             $table->text('analisis_ai');
             $table->float('confidence')->nullable();
+            $table->decimal('serving_qty', 5, 2)->default(1);
+            $table->decimal('total_calories', 8, 2)->nullable();  
+            $table->enum('meal_type', ['breakfast','lunch','dinner','snack'])->nullable(); // waktu makan
+            $table->date('consumed_at')->nullable();
             $table->timestamps();
         });
     }
