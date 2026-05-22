@@ -15,18 +15,14 @@ class ScanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'image'     => 'required|image|max:5120',
-            'meal_type' => 'nullable|in:breakfast,lunch,dinner,snack',
+            'image'       => 'required|image|max:5120',
+            'meal_type'   => 'nullable|in:breakfast,lunch,dinner,snack',
             'serving_qty' => 'nullable|numeric|min:0.1',
         ]);
 
-        // 1. Simpan foto
         $path = $request->file('image')->store('scans', 'public');
-
-        // 2. Analisis AI — cocokkan dengan database nutrition
         $analisisResult = $this->analisisAI($request->file('image'));
 
-        // 3. Cari nutrition di database
         $nutrition = Nutrition::where('key', $analisisResult['key'])->first();
 
         if (!$nutrition) {
@@ -36,11 +32,9 @@ class ScanController extends Controller
             ], 404);
         }
 
-        // 4. Hitung total kalori
-        $servingQty   = $request->serving_qty ?? 1;
+        $servingQty    = $request->serving_qty ?? 1;
         $totalCalories = $nutrition->calories * $servingQty;
 
-        // 5. Simpan hasil scan
         $result = Result::create([
             'user_id'        => $request->user()->id,
             'nutrition_id'   => $nutrition->id,
@@ -53,7 +47,6 @@ class ScanController extends Controller
             'consumed_at'    => now()->toDateString(),
         ]);
 
-        // 6. Update daily summary
         $this->updateDailySummary($request->user()->id, $nutrition, $servingQty);
 
         return response()->json([
@@ -65,10 +58,69 @@ class ScanController extends Controller
         ], 201);
     }
 
+    // GET /api/scan/{id}
+    public function show(Request $request, $id)
+    {
+        $result = Result::with('nutrition')
+            ->where('user_id', $request->user()->id)
+            ->find($id);
+
+        if (!$result) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Data scan tidak ditemukan',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $result,
+        ]);
+    }
+
+    // DELETE /api/scan/{id}/reset
+    public function reset(Request $request, $id)
+    {
+        $result = Result::where('user_id', $request->user()->id)->find($id);
+
+        if (!$result) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Data scan tidak ditemukan',
+            ], 404);
+        }
+
+        // Hapus foto dari storage
+        if ($result->scan_image && Storage::disk('public')->exists($result->scan_image)) {
+            Storage::disk('public')->delete($result->scan_image);
+        }
+
+        // Kurangi daily summary
+        $summary = DailySummary::where('user_id', $request->user()->id)
+            ->where('date', $result->consumed_at)
+            ->first();
+
+        if ($summary) {
+            $nutrition = $result->nutrition;
+            $qty       = $result->serving_qty;
+
+            $summary->decrement('total_calories', $nutrition->calories * $qty);
+            $summary->decrement('total_protein',  $nutrition->protein * $qty);
+            $summary->decrement('total_carbs',    $nutrition->carbs * $qty);
+            $summary->decrement('total_fat',      $nutrition->fat * $qty);
+            $summary->decrement('scan_count',     1);
+        }
+
+        $result->delete();
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Scan berhasil direset, silakan scan ulang',
+        ]);
+    }
+
     private function analisisAI($image): array
     {
-        // Placeholder — nanti diganti dengan AI sesungguhnya
-        // Contoh: Google Vision API, OpenAI Vision, dll
         return [
             'key'        => 'bk-beefburger',
             'analisis'   => 'Terdeteksi: Burger King Beef Burger',

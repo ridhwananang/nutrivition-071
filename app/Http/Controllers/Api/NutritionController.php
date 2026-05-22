@@ -8,30 +8,42 @@ use Illuminate\Http\Request;
 
 class NutritionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // GET /api/nutrition
     public function index()
     {
         $nutrition = Nutrition::all();
 
         return response()->json([
-            'status'  => 'success',
-            'data'    => $nutrition,
+            'status' => 'success',
+            'total'  => $nutrition->count(),
+            'data'   => $nutrition,
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // GET /api/nutrition/search?q=burger
+    public function search(Request $request)
     {
-        //
+        $q = $request->query('q');
+
+        if (!$q) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Parameter pencarian tidak boleh kosong',
+            ], 422);
+        }
+
+        $results = Nutrition::where('item', 'like', "%{$q}%")
+            ->orWhere('brand', 'like', "%{$q}%")
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'total'  => $results->count(),
+            'data'   => $results,
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // GET /api/nutrition/{key}
     public function show($key)
     {
         $nutrition = Nutrition::where('key', $key)->first();
@@ -49,19 +61,7 @@ class NutritionController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    public function store(Request $request) {}
+    public function update(Request $request, string $id) {}
+    public function destroy(string $id) {}
 }
