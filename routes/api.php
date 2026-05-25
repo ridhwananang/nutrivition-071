@@ -21,8 +21,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout',            [AuthController::class, 'logout']);
     Route::get('/profile',            [ProfileController::class, 'show']);
     Route::put('/profile',            [ProfileController::class, 'update']);
-    Route::get('/user/diet-mode',     [ProfileController::class, 'getDietMode']);    // ← tambah
-    Route::post('/user/diet-mode',    [ProfileController::class, 'setDietMode']);    // ← tambah
     Route::get('/dashboard',          [DashboardController::class, 'index']);        // ← tambah
     Route::get('/stats/weekly',       [StatsController::class, 'weekly']);           // ← tambah
     Route::get('/stats/monthly',      [StatsController::class, 'monthly']);          // ← tambah

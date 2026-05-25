@@ -33,32 +33,4 @@ class ProfileController extends Controller
             'data'    => $user,
         ]);
     }
-
-    // GET /api/user/diet-mode
-    public function getDietMode(Request $request)
-    {
-        return response()->json([
-            'status' => 'success',
-            'data'   => [
-                'diet_mode' => $request->user()->diet_mode ?? 'normal',
-                'available' => ['normal', 'keto', 'vegan', 'vegetarian', 'low-carb', 'high-protein'],
-            ],
-        ]);
-    }
-
-    // POST /api/user/diet-mode
-    public function setDietMode(Request $request)
-    {
-        $request->validate([
-            'diet_mode' => 'required|in:normal,keto,vegan,vegetarian,low-carb,high-protein',
-        ]);
-
-        $request->user()->update(['diet_mode' => $request->diet_mode]);
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Mode diet berhasil diubah',
-            'data'    => ['diet_mode' => $request->diet_mode],
-        ]);
-    }
 }

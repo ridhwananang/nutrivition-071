@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Nutrition;
 use App\Models\Result;
-use App\Models\DailySummary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 class ScanController extends Controller
 {
@@ -21,39 +21,69 @@ class ScanController extends Controller
         ]);
 
         $path = $request->file('image')->store('scans', 'public');
-        $analisisResult = $this->analisisAI($request->file('image'));
+        $detectedItems = $this->analisisAI($request->file('image'));
 
-        $nutrition = Nutrition::where('key', $analisisResult['key'])->first();
-
-        if (!$nutrition) {
+        // Jika terjadi error koneksi atau model gagal mengenali sama sekali
+        if (empty($detectedItems) || isset($detectedItems[0]['error'])) {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'Makanan tidak dikenali dalam database',
+                'message' => $detectedItems[0]['error'] ?? 'Gagal menganalisis gambar makanan dengan AI',
+            ], 422);
+        }
+
+        $createdResults = [];
+        $savedNutritionItems = [];
+        $servingQty = $request->serving_qty ?? 1;
+
+        foreach ($detectedItems as $item) {
+            $nutrition = Nutrition::where('key', $item['key'])->first();
+
+            // Hanya simpan jika kunci makanan ditemukan di database gizi kita
+            if ($nutrition) {
+                $totalCalories = $nutrition->calories * $servingQty;
+
+                $result = Result::create([
+                    'user_id'        => $request->user()->id,
+                    'nutrition_id'   => $nutrition->id,
+                    'scan_image'     => $path,
+                    'analisis_ai'    => $item['analisis'],
+                    'confidence'     => $item['confidence'],
+                    'serving_qty'    => $servingQty,
+                    'total_calories' => $totalCalories,
+                    'meal_type'      => $request->meal_type,
+                    'consumed_at'    => now()->toDateString(),
+                ]);
+
+                $createdResults[] = $result;
+                $savedNutritionItems[] = $nutrition;
+            }
+        }
+
+        // Jika ada makanan terdeteksi tetapi tidak ada satupun yang terdaftar di database gizi kita
+        if (empty($createdResults)) {
+            $firstLabel = $detectedItems[0]['key'] ?? 'unknown';
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Makanan terdeteksi (' . $firstLabel . ') namun tidak ditemukan di database gizi.',
             ], 404);
         }
 
-        $servingQty    = $request->serving_qty ?? 1;
-        $totalCalories = $nutrition->calories * $servingQty;
+        // Buat nama gabungan makanan untuk pesan sukses (misal: "Nuggets, French Fries, Cola")
+        $itemNames = collect($savedNutritionItems)->map(function ($nut) {
+            return $nut->item;
+        })->implode(', ');
 
-        $result = Result::create([
-            'user_id'        => $request->user()->id,
-            'nutrition_id'   => $nutrition->id,
-            'scan_image'     => $path,
-            'analisis_ai'    => $analisisResult['analisis'],
-            'confidence'     => $analisisResult['confidence'],
-            'serving_qty'    => $servingQty,
-            'total_calories' => $totalCalories,
-            'meal_type'      => $request->meal_type,
-            'consumed_at'    => now()->toDateString(),
-        ]);
-
-        $this->updateDailySummary($request->user()->id, $nutrition, $servingQty);
+        // Kirimkan record pertama sebagai response primer agar cocok dengan interface React
+        $primaryResult = $createdResults[0];
+        $primaryNutrition = clone $savedNutritionItems[0];
+        $primaryNutrition->item = $itemNames;
 
         return response()->json([
             'status' => 'success',
             'data'   => [
-                'result'    => $result,
-                'nutrition' => $nutrition,
+                'result'    => $primaryResult,
+                'nutrition' => $primaryNutrition,
+                'all_saved' => $createdResults,
             ],
         ], 201);
     }
@@ -95,22 +125,6 @@ class ScanController extends Controller
             Storage::disk('public')->delete($result->scan_image);
         }
 
-        // Kurangi daily summary
-        $summary = DailySummary::where('user_id', $request->user()->id)
-            ->where('date', $result->consumed_at)
-            ->first();
-
-        if ($summary) {
-            $nutrition = $result->nutrition;
-            $qty       = $result->serving_qty;
-
-            $summary->decrement('total_calories', $nutrition->calories * $qty);
-            $summary->decrement('total_protein',  $nutrition->protein * $qty);
-            $summary->decrement('total_carbs',    $nutrition->carbs * $qty);
-            $summary->decrement('total_fat',      $nutrition->fat * $qty);
-            $summary->decrement('scan_count',     1);
-        }
-
         $result->delete();
 
         return response()->json([
@@ -121,35 +135,71 @@ class ScanController extends Controller
 
     private function analisisAI($image): array
     {
-        return [
-            'key'        => 'bk-beefburger',
-            'analisis'   => 'Terdeteksi: Burger King Beef Burger',
-            'confidence' => 0.92,
-        ];
+        $filePath = $image->getPathname();
+        $fileName = $image->getClientOriginalName();
+
+        // 1. Coba port lokal 7860 dulu (jika user menjalankan inference.py secara lokal)
+        try {
+            $response = Http::timeout(5)
+                ->attach('file', file_get_contents($filePath), $fileName)
+                ->post('http://127.0.0.1:7860/predict');
+
+            if ($response->successful()) {
+                return $this->parseResponse($response->json());
+            }
+        } catch (\Exception $e) {
+            // Abaikan error lokal, lanjut ke fallback cloud
+        }
+
+        // 2. Fallback: Panggil API cloud Hugging Face
+        try {
+            $response = Http::timeout(30)
+                ->attach('file', file_get_contents($filePath), $fileName)
+                ->post('https://galihkjaya-nutrivision-api.hf.space/predict');
+
+            if ($response->successful()) {
+                return $this->parseResponse($response->json());
+            }
+
+            return [
+                ['error' => 'Gagal menghubungi server AI cloud (Status: ' . $response->status() . ')']
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                ['error' => 'Error koneksi AI: ' . $e->getMessage() . '. Pastikan Space hf.co aktif atau jalankan "python inference.py" secara lokal.']
+            ];
+        }
     }
 
-    private function updateDailySummary($userId, Nutrition $nutrition, $qty): void
+    private function parseResponse(array $result): array
     {
-        $today = now()->toDateString();
+        $items = $result['items'] ?? [];
 
-        $summary = DailySummary::firstOrCreate(
-            ['user_id' => $userId, 'date' => $today],
-            [
-                'total_calories' => 0,
-                'total_protein'  => 0,
-                'total_carbs'    => 0,
-                'total_fat'      => 0,
-                'total_fiber'    => 0,
-                'total_sugar'    => 0,
-                'total_sodium'   => 0,
-                'scan_count'     => 0,
-            ]
-        );
+        if (empty($items)) {
+            return [
+                ['error' => 'Makanan tidak dikenali dalam foto']
+            ];
+        }
 
-        $summary->increment('total_calories', $nutrition->calories * $qty);
-        $summary->increment('total_protein',  $nutrition->protein * $qty);
-        $summary->increment('total_carbs',    $nutrition->carbs * $qty);
-        $summary->increment('total_fat',      $nutrition->fat * $qty);
-        $summary->increment('scan_count',     1);
+        // Urutkan item berdasarkan skor kecocokan (score) tertinggi ke terendah
+        usort($items, function ($a, $b) {
+            $scoreA = $a['score'] ?? 0;
+            $scoreB = $b['score'] ?? 0;
+            if ($scoreA == $scoreB) return 0;
+            return ($scoreA < $scoreB) ? 1 : -1;
+        });
+
+        $parsed = [];
+        foreach ($items as $item) {
+            $parsed[] = [
+                'key'        => $item['label'],
+                'analisis'   => 'Terdeteksi: ' . ucwords(str_replace('-', ' ', $item['label'])),
+                'confidence' => (float)($item['score'] ?? 0.0),
+            ];
+        }
+
+        return $parsed;
     }
+
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Result;
-use App\Models\DailySummary;
 use Illuminate\Http\Request;
 
 class HistoryController extends Controller
@@ -66,8 +65,18 @@ class HistoryController extends Controller
     // GET /api/daily-summary
     public function dailySummary(Request $request)
     {
-        $summaries = DailySummary::where('user_id', $request->user()->id)
-            ->orderBy('date', 'desc')
+        $summaries = Result::join('nutrition', 'result.nutrition_id', '=', 'nutrition.id')
+            ->where('result.user_id', $request->user()->id)
+            ->selectRaw('
+                result.consumed_at as date,
+                SUM(nutrition.calories * result.serving_qty) as total_calories,
+                SUM(nutrition.protein * result.serving_qty) as total_protein,
+                SUM(nutrition.carbs * result.serving_qty) as total_carbs,
+                SUM(nutrition.fat * result.serving_qty) as total_fat,
+                COUNT(result.id) as scan_count
+            ')
+            ->groupBy('result.consumed_at')
+            ->orderBy('result.consumed_at', 'desc')
             ->get();
 
         return response()->json([

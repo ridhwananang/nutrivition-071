@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\DailySummary;
 use App\Models\Result;
 use Illuminate\Http\Request;
 
@@ -15,10 +14,27 @@ class DashboardController extends Controller
         $user  = $request->user();
         $today = now()->toDateString();
 
-        // Summary hari ini
-        $summary = DailySummary::where('user_id', $user->id)
-            ->where('date', $today)
+        // Summary hari ini secara dinamis dari tabel result join nutrition
+        $summaryData = Result::join('nutrition', 'result.nutrition_id', '=', 'nutrition.id')
+            ->where('result.user_id', $user->id)
+            ->whereDate('result.consumed_at', $today)
+            ->selectRaw('
+                SUM(nutrition.calories * result.serving_qty) as total_calories,
+                SUM(nutrition.protein * result.serving_qty) as total_protein,
+                SUM(nutrition.carbs * result.serving_qty) as total_carbs,
+                SUM(nutrition.fat * result.serving_qty) as total_fat,
+                COUNT(result.id) as scan_count
+            ')
             ->first();
+
+        $summary = (object)[
+            'total_calories' => (float)($summaryData->total_calories ?? 0),
+            'total_protein'  => (float)($summaryData->total_protein ?? 0),
+            'total_carbs'    => (float)($summaryData->total_carbs ?? 0),
+            'total_fat'      => (float)($summaryData->total_fat ?? 0),
+            'total_fiber'    => 0,
+            'scan_count'     => (int)($summaryData->scan_count ?? 0),
+        ];
 
         // Scan terakhir hari ini
         $recentScans = Result::with('nutrition')
