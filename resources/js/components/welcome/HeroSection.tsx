@@ -18,7 +18,7 @@ export default function HeroSection({ handleScrollToSection }: HeroSectionProps)
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-4 py-2 backdrop-blur-md">
                         <span className="h-2 w-2 animate-ping rounded-full bg-amber-300"></span>
                         <span className="text-xs font-bold tracking-widest uppercase">
-                            Laravel Breeze Ready v2.5
+                            Nutrivision Engine v1.0
                         </span>
                     </div>
                     <h1 className="text-4xl leading-[1.1] font-extrabold tracking-tight uppercase italic sm:text-5xl lg:text-7xl">
@@ -26,9 +26,8 @@ export default function HeroSection({ handleScrollToSection }: HeroSectionProps)
                         Dalam Sekejap.
                     </h1>
                     <p className="max-w-sm text-sm leading-relaxed opacity-90 sm:max-w-md sm:text-lg">
-                        Sistem deteksi fast-food berbasis AI tercanggih
-                        dengan kemudahan drop-in Laravel starter kit. Pantau
-                        kalori, lemak, dan protein melalui jepretan kamera Anda.
+                        Sistem deteksi makanan berbasis kecerdasan komputasi. Pantau
+                        kalori, lemak, dan protein melalui jepretan kamera Anda secara real-time.
                     </p>
 
                     <div className="flex flex-wrap gap-4 pt-2">
@@ -47,7 +46,7 @@ export default function HeroSection({ handleScrollToSection }: HeroSectionProps)
                     </div>
                 </div>
 
-                {/* Simulated AI Device visual Mockup */}
+                {/* Representasi Kamera Pemindai */}
                 <div className="relative z-10 mx-auto mt-8 block w-full max-w-xs select-none sm:max-w-md lg:mt-0">
                     <div className="mx-auto max-w-md rotate-3 transform overflow-hidden rounded-[2rem] border border-white/10 bg-white/95 p-4 shadow-2xl backdrop-blur-md transition-transform duration-500 hover:rotate-1 sm:rounded-[3rem] dark:bg-neutral-900/95">
                         <div className="relative aspect-square overflow-hidden rounded-[1.5rem] sm:rounded-[2.5rem]">
@@ -56,7 +55,7 @@ export default function HeroSection({ handleScrollToSection }: HeroSectionProps)
                                 className="h-full w-full object-cover shadow-inner"
                                 alt="Visual Burger"
                             />
-                            {/* Digital scanner line simulation */}
+                            {/* Sensor Kamera Pemindai */}
                             <div className="absolute top-0 right-0 left-0 h-1 animate-bounce bg-amber-400 shadow-xl"></div>
                         </div>
 

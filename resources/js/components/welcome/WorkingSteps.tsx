@@ -39,7 +39,7 @@ export default function WorkingSteps() {
                             2
                         </div>
                         <h4 className="mt-4 mb-2 text-lg font-extrabold text-slate-800 italic dark:text-white">
-                            Analisis Cerdas Gemini
+                            Analisis Gizi Otomatis
                         </h4>
                         <p className="text-xs leading-relaxed font-medium text-slate-500 dark:text-neutral-400">
                             Algoritma AI secara instan membagi komposisi

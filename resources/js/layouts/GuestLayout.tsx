@@ -26,7 +26,7 @@ export default function GuestLayout({
     minimal = false,
 }: GuestLayoutProps) {
     return (
-        <div className="flex min-h-screen flex-col bg-[#FCFCFC] dark:bg-neutral-950 font-sans text-slate-950 dark:text-white selection:bg-amber-500 selection:text-white">
+        <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#FCFCFC] dark:bg-neutral-950 font-sans text-slate-950 dark:text-white selection:bg-amber-500 selection:text-white">
             {/* Header / Navigation system */}
             {minimal ? (
                 <header className="flex h-20 items-center justify-between px-6 sm:px-12 border-b border-slate-100 dark:border-neutral-900 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-lg sticky top-0 z-50">
@@ -194,7 +194,7 @@ export default function GuestLayout({
                                         POWERED BY
                                     </span>
                                     <span className="text-[10px] font-black tracking-widest text-slate-400 italic">
-                                        GEMINI AI SYSTEM
+                                        NUTRIVISION ENGINE
                                     </span>
                                 </div>
                             </div>

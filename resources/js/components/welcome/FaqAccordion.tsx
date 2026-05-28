@@ -14,12 +14,12 @@ export default function FaqAccordion() {
             a: 'Ya! Estimasi dikalibrasi mendekati standar AKG Indonesia dengan margin galat rendah untuk porsi makan rata-rata. Anda juga bisa menyesuaikan berat porsi jika merasa porsinya khusus.',
         },
         {
-            q: 'Bisakah saya mengintegrasikan visual layout ini ke Laravel?',
-            a: 'Sangat mudah! Struktur component, state management, dan styling Tailwind ini ramah untuk Laravel Breeze, Inertia.js React, atau Laravel blade template.',
+            q: 'Teknologi apa saja yang digunakan untuk membangun sistem ini?',
+            a: 'Aplikasi ini dikembangkan menggunakan arsitektur modern berbasis Laravel (sebagai RESTful API & Controller) yang terintegrasi secara mulus dengan Inertia.js React di sisi frontend, didukung oleh Tailwind CSS untuk styling responsif, serta AI Engine untuk deteksi gizi.',
         },
         {
-            q: 'Apakah data harian asupan saya tersimpan aman?',
-            a: 'Tentu saja. Dalam setup Laravel Starter ini, Anda dapat memprogram penyimpanan data pengguna Anda secara kuat di basis data lokal SQLite/PostgreSQL menggunakan Laravel Eloquent ORM.',
+            q: 'Apakah data asupan makanan harian saya tersimpan dengan aman?',
+            a: 'Tentu saja. Seluruh data asupan gizi harian dan data kredensial Anda disimpan secara aman di basis data PostgreSQL menggunakan enkripsi Eloquent ORM Laravel serta sistem proteksi autentikasi yang ketat.',
         },
     ];
 

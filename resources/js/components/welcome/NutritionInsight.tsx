@@ -4,7 +4,7 @@ export default function NutritionInsight() {
     return (
         <section
             id="insight"
-            className="border-t border-slate-50 bg-[#FCFCFC] py-24 dark:border-neutral-900 dark:bg-neutral-950"
+            className="border-t border-slate-50 bg-[#FCFCFC] py-24 dark:border-neutral-900 dark:bg-neutral-950 overflow-hidden"
         >
             <div className="mx-auto max-w-7xl px-4 sm:px-6">
                 <div className="grid items-center gap-16 lg:grid-cols-2">
@@ -67,7 +67,7 @@ export default function NutritionInsight() {
                         </div>
                     </div>
 
-                    {/* Styled Mock Salad bowl card */}
+                    {/* Representasi visual detail nutrisi salad deluxe */}
                     <div className="relative">
                         <div className="relative z-10 mx-auto max-w-sm rounded-[3rem] border border-slate-100 bg-white p-8 shadow-xl sm:max-w-md dark:border-neutral-900 dark:bg-neutral-900">
                             <div className="mb-6 flex items-center gap-4">

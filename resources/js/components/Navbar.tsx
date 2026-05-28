@@ -6,7 +6,7 @@ import { useAppearance } from '@/hooks/use-appearance';
 
 interface NavbarProps {
     onScrollToSection: (id: string) => void;
-    user?: any; // Simulating auth.user prop in Laravel Breeze template
+    user?: any; // Interface data untuk user terautentikasi
     onNavigate?: (page: string) => void;
     onLogout?: () => void;
 }
@@ -73,7 +73,7 @@ export default function Navbar({
                     ))}
                 </div>
 
-                {/* Action Buttons (Laravel Breeze styled) */}
+                {/* Tombol Aksi Pilihan */}
                 <div className="hidden items-center gap-4 md:flex">
                     {/* Theme Toggle Button */}
                     <button

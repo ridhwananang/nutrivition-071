@@ -37,7 +37,7 @@ export default function AiChatbot() {
         'Makanan lokal tinggi protein? 🍗'
     ];
 
-    // Simulated AI response knowledge base
+    // Basis pengetahuan respons konsultasi gizi lokal
     const getAiResponse = (userInput: string): string => {
         const input = userInput.toLowerCase();
         
@@ -45,7 +45,7 @@ export default function AiChatbot() {
             return 'Satu porsi **Nasi Goreng** standar (sekitar 250 gram) diperkirakan memiliki kandungan gizi sebagai berikut:\n\n• **Kalori:** ~350 - 450 kkal\n• **Karbohidrat:** ~50g\n• **Lemak:** ~18g\n• **Protein:** ~8g\n\n*Tips NutriVision:* Nasi goreng cenderung tinggi lemak karena minyak goreng. Cobalah tambahkan dada ayam suwir atau putih telur rebus untuk menaikkan kandungan protein harian Anda! 🍳';
         }
         if (input.includes('visual scan') || input.includes('cara kerja') || input.includes('kamera') || input.includes('pindai')) {
-            return 'Teknologi **Visual Scan AI** di NutriVision memanfaatkan model vision-language canggih berbasis Gemini AI. 📸\n\nCara kerjanya mudah:\n1. Jepret makanan Anda langsung lewat kamera atau unggah file.\n2. AI mengenali jenis masakan Indonesia & porsinya.\n3. Gizi & makronutrisi harian Anda dihitung instan & dicatat ke database dashboard Anda!';
+            return 'Teknologi **Visual Scan AI** di NutriVision memanfaatkan model vision-language canggih berbasis Artificial Intelligence. 📸\n\nCara kerjanya mudah:\n1. Jepret makanan Anda langsung lewat kamera atau unggah file.\n2. AI mengenali jenis masakan Indonesia & porsinya.\n3. Gizi & makronutrisi harian Anda dihitung instan & dicatat ke database dashboard Anda!';
         }
         if (input.includes('defisit kalori') || input.includes('diet') || input.includes('sehat') || input.includes('bugar')) {
             return 'Untuk **Diet Defisit Kalori** yang sehat & aman:\n\n1. Hitung kebutuhan kalori harian Anda (TDEE).\n2. Kurangi secara bertahap sekitar **300 - 500 kkal** di bawah kalori harian Anda.\n3. Pastikan asupan protein tetap tercukupi (1.5g per kg berat badan) agar massa otot terjaga.\n4. Gunakan pemindai AI NutriVision secara teratur untuk memonitor margin kalori tersisa Anda!';
@@ -71,7 +71,7 @@ export default function AiChatbot() {
         setInputValue('');
         setIsTyping(true);
 
-        // Simulate organic typing lag
+        // Jeda waktu respons alami untuk kenyamanan visual
         setTimeout(() => {
             const aiMessage: Message = {
                 id: (Date.now() + 1).toString(),
