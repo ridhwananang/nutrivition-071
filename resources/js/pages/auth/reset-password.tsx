@@ -1,10 +1,8 @@
 import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
+import InputLabel from '@/components/InputLabel';
+import TextInput from '@/components/TextInput';
+import InputError from '@/components/InputError';
+import PrimaryButton from '@/components/PrimaryButton';
 import { update } from '@/routes/password';
 
 type Props = {
@@ -15,72 +13,72 @@ type Props = {
 export default function ResetPassword({ token, email }: Props) {
     return (
         <>
-            <Head title="Reset password" />
+            <Head title="Atur Ulang Kata Sandi" />
 
             <Form
                 {...update.form()}
                 transform={(data) => ({ ...data, token, email })}
                 resetOnSuccess={['password', 'password_confirmation']}
+                className="space-y-6"
             >
                 {({ processing, errors }) => (
-                    <div className="grid gap-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
+                    <>
+                        <div className="space-y-2">
+                            <InputLabel htmlFor="email" value="Alamat Email" />
+                            <TextInput
                                 id="email"
                                 type="email"
                                 name="email"
                                 autoComplete="email"
                                 value={email}
-                                className="mt-1 block w-full"
+                                className="block w-full opacity-65 cursor-not-allowed bg-slate-50 dark:bg-neutral-900 border-slate-200 dark:border-neutral-800"
                                 readOnly
                             />
-                            <InputError
-                                message={errors.email}
-                                className="mt-2"
-                            />
+                            <InputError message={errors.email} />
                         </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <PasswordInput
+                        <div className="space-y-2">
+                            <InputLabel htmlFor="password" value="Kata Sandi Baru" />
+                            <TextInput
                                 id="password"
+                                type="password"
                                 name="password"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                autoFocus
-                                placeholder="Password"
+                                className="block w-full focus:border-amber-500 focus:ring-amber-500"
+                                isFocused={true}
+                                required
+                                placeholder="Min. 8 karakter"
                             />
                             <InputError message={errors.password} />
                         </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">
-                                Confirm password
-                            </Label>
-                            <PasswordInput
+                        <div className="space-y-2">
+                            <InputLabel
+                                htmlFor="password_confirmation"
+                                value="Konfirmasi Kata Sandi Baru"
+                            />
+                            <TextInput
                                 id="password_confirmation"
+                                type="password"
                                 name="password_confirmation"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                placeholder="Confirm password"
+                                className="block w-full focus:border-amber-500 focus:ring-amber-500"
+                                required
+                                placeholder="Ulangi kata sandi baru"
                             />
-                            <InputError
-                                message={errors.password_confirmation}
-                                className="mt-2"
-                            />
+                            <InputError message={errors.password_confirmation} />
                         </div>
 
-                        <Button
-                            type="submit"
-                            className="mt-4 w-full"
-                            disabled={processing}
-                            data-test="reset-password-button"
-                        >
-                            {processing && <Spinner />}
-                            Reset password
-                        </Button>
-                    </div>
+                        <div className="pt-2">
+                            <PrimaryButton
+                                type="submit"
+                                className="flex w-full justify-center text-center text-xs font-black tracking-widest uppercase animate-pulse"
+                                disabled={processing}
+                            >
+                                {processing ? 'Memproses...' : 'Atur Ulang Kata Sandi'}
+                            </PrimaryButton>
+                        </div>
+                    </>
                 )}
             </Form>
         </>
@@ -88,6 +86,6 @@ export default function ResetPassword({ token, email }: Props) {
 }
 
 ResetPassword.layout = {
-    title: 'Reset password',
-    description: 'Please enter your new password below',
+    title: 'Atur Ulang Kata Sandi',
+    description: 'Silakan masukkan kata sandi baru Anda di bawah ini',
 };

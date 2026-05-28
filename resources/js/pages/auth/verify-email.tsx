@@ -1,38 +1,42 @@
-// Components
-import { Form, Head } from '@inertiajs/react';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+import { Form, Head, Link } from '@inertiajs/react';
+import PrimaryButton from '@/components/PrimaryButton';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     return (
         <>
-            <Head title="Email verification" />
+            <Head title="Verifikasi Email" />
 
             {status === 'verification-link-sent' && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
+                <div className="flex items-center gap-2 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs leading-relaxed font-semibold text-emerald-700 mb-4 animate-fade-in">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                    Tautan verifikasi baru telah dikirim ke alamat email yang Anda daftarkan.
                 </div>
             )}
 
-            <Form {...send.form()} className="space-y-6 text-center">
+            <Form {...send.form()} className="space-y-6">
                 {({ processing }) => (
-                    <>
-                        <Button disabled={processing} variant="secondary">
-                            {processing && <Spinner />}
-                            Resend verification email
-                        </Button>
-
-                        <TextLink
-                            href={logout()}
-                            className="mx-auto block text-sm"
+                    <div className="space-y-4">
+                        <PrimaryButton
+                            type="submit"
+                            className="flex w-full justify-center text-center text-xs font-black tracking-widest uppercase animate-pulse"
+                            disabled={processing}
                         >
-                            Log out
-                        </TextLink>
-                    </>
+                            {processing ? 'Mengirim Ulang...' : 'Kirim Ulang Email Verifikasi'}
+                        </PrimaryButton>
+
+                        <div className="flex justify-center pt-2">
+                            <Link
+                                href={logout()}
+                                method="post"
+                                as="button"
+                                className="cursor-pointer text-xs font-bold text-slate-500 hover:text-amber-500 transition duration-150"
+                            >
+                                Keluar Aplikasi
+                            </Link>
+                        </div>
+                    </div>
                 )}
             </Form>
         </>
@@ -40,7 +44,6 @@ export default function VerifyEmail({ status }: { status?: string }) {
 }
 
 VerifyEmail.layout = {
-    title: 'Verify email',
-    description:
-        'Please verify your email address by clicking on the link we just emailed to you.',
+    title: 'Verifikasi Email',
+    description: 'Silakan verifikasi alamat email Anda dengan mengklik tautan yang baru saja kami kirimkan ke email Anda.',
 };

@@ -1,43 +1,43 @@
 import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
+import InputLabel from '@/components/InputLabel';
+import TextInput from '@/components/TextInput';
+import InputError from '@/components/InputError';
+import PrimaryButton from '@/components/PrimaryButton';
 import { store } from '@/routes/password/confirm';
 
 export default function ConfirmPassword() {
     return (
         <>
-            <Head title="Confirm password" />
+            <Head title="Konfirmasi Kata Sandi" />
 
-            <Form {...store.form()} resetOnSuccess={['password']}>
+            <Form {...store.form()} resetOnSuccess={['password']} className="space-y-6">
                 {({ processing, errors }) => (
-                    <div className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <PasswordInput
+                    <>
+                        <div className="space-y-2">
+                            <InputLabel htmlFor="password" value="Kata Sandi" />
+                            <TextInput
                                 id="password"
+                                type="password"
                                 name="password"
-                                placeholder="Password"
+                                placeholder="Masukkan kata sandi Anda"
                                 autoComplete="current-password"
-                                autoFocus
+                                className="block w-full focus:border-amber-500 focus:ring-amber-500"
+                                isFocused={true}
+                                required
                             />
-
                             <InputError message={errors.password} />
                         </div>
 
-                        <div className="flex items-center">
-                            <Button
-                                className="w-full"
+                        <div className="pt-2">
+                            <PrimaryButton
+                                type="submit"
+                                className="flex w-full justify-center text-center text-xs font-black tracking-widest uppercase animate-pulse"
                                 disabled={processing}
-                                data-test="confirm-password-button"
                             >
-                                {processing && <Spinner />}
-                                Confirm password
-                            </Button>
+                                {processing ? 'Mengonfirmasi...' : 'Konfirmasi Sandi'}
+                            </PrimaryButton>
                         </div>
-                    </div>
+                    </>
                 )}
             </Form>
         </>
@@ -45,7 +45,6 @@ export default function ConfirmPassword() {
 }
 
 ConfirmPassword.layout = {
-    title: 'Confirm your password',
-    description:
-        'This is a secure area of the application. Please confirm your password before continuing.',
+    title: 'Konfirmasi Sandi',
+    description: 'Ini adalah area aplikasi yang aman. Silakan konfirmasikan kata sandi Anda sebelum melanjutkan.',
 };
