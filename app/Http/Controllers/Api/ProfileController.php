@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProfileResource;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
@@ -12,7 +13,7 @@ class ProfileController extends Controller
     {
         return response()->json([
             'status' => 'success',
-            'data'   => $request->user(),
+            'data'   => new ProfileResource($request->user()),
         ]);
     }
 
@@ -30,7 +31,7 @@ class ProfileController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Profil berhasil diupdate',
-            'data'    => $user,
+            'data'    => new ProfileResource($user),
         ]);
     }
 }

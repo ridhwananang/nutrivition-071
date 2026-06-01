@@ -3,31 +3,34 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Result;
+use App\Http\Resources\HistoryResource;
+use App\Repositories\ScanRepositoryInterface;
 use Illuminate\Http\Request;
 
 class HistoryController extends Controller
 {
+    protected ScanRepositoryInterface $scanRepository;
+
+    public function __construct(ScanRepositoryInterface $scanRepository)
+    {
+        $this->scanRepository = $scanRepository;
+    }
+
     // GET /api/history
     public function index(Request $request)
     {
-        $history = Result::with('nutrition')
-            ->where('user_id', $request->user()->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $history = $this->scanRepository->getHistory($request->user()->id);
 
         return response()->json([
             'status' => 'success',
-            'data'   => $history,
+            'data'   => HistoryResource::collection($history),
         ]);
     }
 
     // GET /api/history/{id}
     public function show(Request $request, $id)
     {
-        $result = Result::with('nutrition')
-            ->where('user_id', $request->user()->id)
-            ->find($id);
+        $result = $this->scanRepository->findScan($id, $request->user()->id);
 
         if (!$result) {
             return response()->json([
@@ -38,23 +41,21 @@ class HistoryController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => $result,
+            'data'   => new HistoryResource($result),
         ]);
     }
 
     // DELETE /api/history/{id}
     public function destroy(Request $request, $id)
     {
-        $result = Result::where('user_id', $request->user()->id)->find($id);
+        $deleted = $this->scanRepository->deleteScan($id, $request->user()->id);
 
-        if (!$result) {
+        if (!$deleted) {
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Data tidak ditemukan',
             ], 404);
         }
-
-        $result->delete();
 
         return response()->json([
             'status'  => 'success',
@@ -65,23 +66,33 @@ class HistoryController extends Controller
     // GET /api/daily-summary
     public function dailySummary(Request $request)
     {
-        $summaries = Result::join('nutrition', 'result.nutrition_id', '=', 'nutrition.id')
-            ->where('result.user_id', $request->user()->id)
-            ->selectRaw('
-                result.consumed_at as date,
-                SUM(nutrition.calories * result.serving_qty) as total_calories,
-                SUM(nutrition.protein * result.serving_qty) as total_protein,
-                SUM(nutrition.carbs * result.serving_qty) as total_carbs,
-                SUM(nutrition.fat * result.serving_qty) as total_fat,
-                COUNT(result.id) as scan_count
-            ')
-            ->groupBy('result.consumed_at')
-            ->orderBy('result.consumed_at', 'desc')
-            ->get();
+        $summaries = $this->scanRepository->getDailySummary($request->user()->id);
+
+        // Bungkus data array dengan HATEOAS links
+        $formattedData = $summaries->map(function ($item) {
+            return [
+                'date'           => $item->date,
+                'total_calories' => (float) $item->total_calories,
+                'total_protein'  => (float) $item->total_protein,
+                'total_carbs'    => (float) $item->total_carbs,
+                'total_fat'      => (float) $item->total_fat,
+                'scan_count'     => (int) $item->scan_count,
+                '_links'         => [
+                    'self' => [
+                        'href'   => url('/api/daily-summary?date=' . $item->date),
+                        'method' => 'GET',
+                    ],
+                    'dashboard' => [
+                        'href'   => url('/api/dashboard'),
+                        'method' => 'GET',
+                    ],
+                ]
+            ];
+        });
 
         return response()->json([
             'status' => 'success',
-            'data'   => $summaries,
+            'data'   => $formattedData,
         ]);
     }
 }

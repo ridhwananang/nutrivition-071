@@ -19,8 +19,9 @@ class GoogleController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
         } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
-            // Fallback to stateless mode if the state token verification fails due to local session mismatches
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            /** @var \Laravel\Socialite\Two\GoogleProvider $driver */
+            $driver = Socialite::driver('google');
+            $googleUser = $driver->stateless()->user();
         } catch (\Exception $e) {
             return redirect('/login')->with('status', 'Autentikasi Google gagal atau dibatalkan. Silakan coba kembali.');
         }

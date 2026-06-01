@@ -3,12 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Result;
+use App\Repositories\ScanRepositoryInterface;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class StatsController extends Controller
 {
+    protected ScanRepositoryInterface $scanRepository;
+
+    public function __construct(ScanRepositoryInterface $scanRepository)
+    {
+        $this->scanRepository = $scanRepository;
+    }
+
     // GET /api/stats/weekly
     public function weekly(Request $request)
     {
@@ -18,21 +25,8 @@ class StatsController extends Controller
         $startDate = Carbon::today()->subDays(6)->toDateString();
         $endDate = Carbon::today()->toDateString();
 
-        // Ambil data rangkuman harian dari tabel result join nutrition
-        $summaries = Result::join('nutrition', 'result.nutrition_id', '=', 'nutrition.id')
-            ->where('result.user_id', $user->id)
-            ->whereBetween('result.consumed_at', [$startDate, $endDate])
-            ->selectRaw('
-                result.consumed_at as date,
-                SUM(nutrition.calories * result.serving_qty) as total_calories,
-                SUM(nutrition.protein * result.serving_qty) as total_protein,
-                SUM(nutrition.carbs * result.serving_qty) as total_carbs,
-                SUM(nutrition.fat * result.serving_qty) as total_fat,
-                COUNT(result.id) as scan_count
-            ')
-            ->groupBy('result.consumed_at')
-            ->get()
-            ->keyBy('date');
+        // Ambil data rangkuman harian dari repositori
+        $summaries = $this->scanRepository->getStatsRange($user->id, $startDate, $endDate);
 
         // Generate 7 hari terakhir
         for ($i = 6; $i >= 0; $i--) {
@@ -47,6 +41,12 @@ class StatsController extends Controller
                 'total_carbs'    => (float)($daySummary->total_carbs ?? 0),
                 'total_fat'      => (float)($daySummary->total_fat ?? 0),
                 'scan_count'     => (int)($daySummary->scan_count ?? 0),
+                '_links'         => [
+                    'self' => [
+                        'href'   => url('/api/daily-summary?date=' . $date),
+                        'method' => 'GET',
+                    ],
+                ]
             ]);
         }
 
@@ -65,21 +65,8 @@ class StatsController extends Controller
         $startDate = Carbon::today()->subDays(29)->toDateString();
         $endDate = Carbon::today()->toDateString();
 
-        // Ambil data rangkuman harian dari tabel result join nutrition
-        $summaries = Result::join('nutrition', 'result.nutrition_id', '=', 'nutrition.id')
-            ->where('result.user_id', $user->id)
-            ->whereBetween('result.consumed_at', [$startDate, $endDate])
-            ->selectRaw('
-                result.consumed_at as date,
-                SUM(nutrition.calories * result.serving_qty) as total_calories,
-                SUM(nutrition.protein * result.serving_qty) as total_protein,
-                SUM(nutrition.carbs * result.serving_qty) as total_carbs,
-                SUM(nutrition.fat * result.serving_qty) as total_fat,
-                COUNT(result.id) as scan_count
-            ')
-            ->groupBy('result.consumed_at')
-            ->get()
-            ->keyBy('date');
+        // Ambil data rangkuman harian dari repositori
+        $summaries = $this->scanRepository->getStatsRange($user->id, $startDate, $endDate);
 
         // Generate 30 hari terakhir
         for ($i = 29; $i >= 0; $i--) {
@@ -94,6 +81,12 @@ class StatsController extends Controller
                 'total_carbs'    => (float)($daySummary->total_carbs ?? 0),
                 'total_fat'      => (float)($daySummary->total_fat ?? 0),
                 'scan_count'     => (int)($daySummary->scan_count ?? 0),
+                '_links'         => [
+                    'self' => [
+                        'href'   => url('/api/daily-summary?date=' . $date),
+                        'method' => 'GET',
+                    ],
+                ]
             ]);
         }
 

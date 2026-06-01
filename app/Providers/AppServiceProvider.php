@@ -15,7 +15,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            \App\Repositories\ScanRepositoryInterface::class,
+            function ($app) {
+                return config('services.storage_driver', env('API_STORAGE_DRIVER', 'database')) === 'file'
+                    ? $app->make(\App\Repositories\FileScanRepository::class)
+                    : $app->make(\App\Repositories\EloquentScanRepository::class);
+            }
+        );
     }
 
     /**

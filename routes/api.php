@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/stats/monthly',      [StatsController::class, 'monthly']);
     Route::post('/scan',              [ScanController::class, 'store']);
     Route::get('/scan/{id}',          [ScanController::class, 'show']);
-    Route::delete('/scan/{id}/reset', [ScanController::class, 'reset']);
+    Route::delete('/scan/{id}',       [ScanController::class, 'reset'])->name('scan.reset');
     Route::get('/history',            [HistoryController::class, 'index']);
     Route::get('/history/{id}',       [HistoryController::class, 'show']);
     Route::delete('/history/{id}',    [HistoryController::class, 'destroy']);

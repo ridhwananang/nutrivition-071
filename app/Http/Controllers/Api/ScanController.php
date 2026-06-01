@@ -3,60 +3,63 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Nutrition;
-use App\Models\Result;
+use App\Http\Resources\ScanResource;
+use App\Repositories\ScanRepositoryInterface;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 
 class ScanController extends Controller
 {
-    // POST /api/scan
+    protected ScanRepositoryInterface $scanRepository;
+
+    public function __construct(ScanRepositoryInterface $scanRepository)
+    {
+        $this->scanRepository = $scanRepository;
+    }
+
     public function store(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|max:5120',
-            'meal_type' => 'nullable|in:breakfast,lunch,dinner,snack',
+            'image'       => 'required|image|max:5120',
+            'meal_type'   => 'nullable|in:breakfast,lunch,dinner,snack',
             'serving_qty' => 'nullable|numeric|min:0.1',
         ]);
 
         $detectedItems = $this->analisisAI($request->file('image'));
 
-        // Jika terjadi error koneksi atau model gagal mengenali sama sekali
         if (empty($detectedItems) || isset($detectedItems[0]['error'])) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => $detectedItems[0]['error'] ?? 'Gagal menganalisis gambar makanan dengan AI',
             ], 422);
         }
 
         $file = $request->file('image');
-        $fileName = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
         $file->move(public_path('storage/scans'), $fileName);
-        $path = 'scans/'.$fileName;
+        $path = 'scans/' . $fileName;
 
         $createdResults = [];
         $savedNutritionItems = [];
         $servingQty = $request->serving_qty ?? 1;
 
         foreach ($detectedItems as $item) {
-            $nutrition = Nutrition::where('key', $item['key'])->first();
+            $nutrition = $this->scanRepository->findNutritionByKey($item['key']);
 
-            // Hanya simpan jika kunci makanan ditemukan di database gizi kita
             if ($nutrition) {
                 $totalCalories = $nutrition->calories * $servingQty;
 
-                $result = Result::create([
-                    'user_id' => $request->user()->id,
-                    'nutrition_id' => $nutrition->id,
-                    'scan_image' => $path,
-                    'analisis_ai' => $item['analisis'],
-                    'confidence' => $item['confidence'],
-                    'serving_qty' => $servingQty,
+                $result = $this->scanRepository->storeScan([
+                    'user_id'        => $request->user()->id,
+                    'nutrition_id'   => $nutrition->id,
+                    'scan_image'     => $path,
+                    'analisis_ai'    => $item['analisis'],
+                    'confidence'     => $item['confidence'],
+                    'serving_qty'    => $servingQty,
                     'total_calories' => $totalCalories,
-                    'meal_type' => $request->meal_type,
-                    'consumed_at' => now()->toDateString(),
+                    'meal_type'      => $request->meal_type,
+                    'consumed_at'    => now()->toDateString(),
                 ]);
 
                 $createdResults[] = $result;
@@ -64,22 +67,19 @@ class ScanController extends Controller
             }
         }
 
-        // Jika ada makanan terdeteksi tetapi tidak ada satupun yang terdaftar di database gizi kita
         if (empty($createdResults)) {
             $firstLabel = $detectedItems[0]['key'] ?? 'unknown';
 
             return response()->json([
-                'status' => 'error',
-                'message' => 'Makanan terdeteksi ('.$firstLabel.') namun tidak ditemukan di database gizi.',
+                'status'  => 'error',
+                'message' => 'Makanan terdeteksi (' . $firstLabel . ') namun tidak ditemukan di database gizi.',
             ], 404);
         }
 
-        // Buat nama gabungan makanan untuk pesan sukses (misal: "Nuggets, French Fries, Cola")
         $itemNames = collect($savedNutritionItems)->map(function ($nut) {
             return $nut->item;
         })->implode(', ');
 
-        // Akumulasikan semua gizi yang terdeteksi
         $totalCalories = 0;
         $totalFat = 0;
         $totalCarbs = 0;
@@ -92,74 +92,65 @@ class ScanController extends Controller
             $totalProtein += floatval($nut->protein) * floatval($servingQty);
         }
 
-        // Kirimkan record pertama sebagai response primer agar cocok dengan interface React
         $primaryResult = $createdResults[0];
         $primaryResult->total_calories = $totalCalories;
-
         $primaryNutrition = clone $savedNutritionItems[0];
         $primaryNutrition->item = $itemNames;
         $primaryNutrition->calories = $totalCalories;
         $primaryNutrition->fat = $totalFat;
         $primaryNutrition->carbs = $totalCarbs;
         $primaryNutrition->protein = $totalProtein;
+        $resource = new ScanResource($primaryResult);
+        $responseData = $resource->toArray($request);
+
+        $responseData['nutrition'] = [
+            'id'           => $primaryNutrition->id,
+            'brand'        => $primaryNutrition->brand,
+            'item'         => $itemNames,
+            'key'          => $primaryNutrition->key,
+            'serving_size' => $primaryNutrition->serving_size,
+            'calories'     => (float) $totalCalories,
+            'fat'          => (float) $totalFat,
+            'carbs'        => (float) $totalCarbs,
+            'protein'      => (float) $totalProtein,
+        ];
 
         return response()->json([
             'status' => 'success',
-            'data' => [
-                'result' => $primaryResult,
-                'nutrition' => $primaryNutrition,
-                'all_saved' => $createdResults,
-            ],
+            'data'   => $responseData,
         ], 201);
     }
 
-    // GET /api/scan/{id}
-    public function show(Request $request, $id)
+    public function show(Request $request, int $id)
     {
-        $result = Result::with('nutrition')
-            ->where('user_id', $request->user()->id)
-            ->find($id);
+        $result = $this->scanRepository->findScan($id, $request->user()->id);
 
-        if (! $result) {
+        if (!$result) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Data scan tidak ditemukan',
             ], 404);
         }
 
         return response()->json([
             'status' => 'success',
-            'data' => $result,
+            'data'   => new ScanResource($result),
         ]);
     }
 
-    // DELETE /api/scan/{id}/reset
-    public function reset(Request $request, $id)
+    public function reset(Request $request, int $id)
     {
-        $result = Result::where('user_id', $request->user()->id)->find($id);
+        $deleted = $this->scanRepository->deleteScan($id, $request->user()->id);
 
-        if (! $result) {
+        if (!$deleted) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Data scan tidak ditemukan',
             ], 404);
         }
 
-        // Hapus foto dari storage
-        if ($result->scan_image) {
-            $physicalPath = public_path('storage/'.$result->scan_image);
-            if (file_exists($physicalPath)) {
-                unlink($physicalPath);
-            }
-            if (Storage::disk('public')->exists($result->scan_image)) {
-                Storage::disk('public')->delete($result->scan_image);
-            }
-        }
-
-        $result->delete();
-
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Scan berhasil direset, silakan scan ulang',
         ]);
     }
@@ -173,7 +164,7 @@ class ScanController extends Controller
         $brandMap = [
             'mcd' => "McDonald's",
             'kfc' => 'KFC',
-            'bk' => 'Burger King',
+            'bk'  => 'Burger King',
         ];
 
         $cleanBrand = $brandMap[strtolower($brand)] ?? strtoupper($brand);
@@ -182,12 +173,11 @@ class ScanController extends Controller
         return "Terdeteksi: {$cleanBrand} - {$cleanItem}";
     }
 
-    private function analisisAI($image): array
+    private function analisisAI(\Illuminate\Http\UploadedFile $image): array
     {
         $filePath = $image->getPathname();
         $fileName = $image->getClientOriginalName();
 
-        // Panggil API cloud Hugging Face secara langsung
         try {
             $response = Http::timeout(90)
                 ->attach('file', file_get_contents($filePath), $fileName)
@@ -204,7 +194,7 @@ class ScanController extends Controller
             }
 
             return [
-                ['error' => 'Gagal menghubungi server AI cloud (Status: '.$response->status().')'],
+                ['error' => 'Gagal menghubungi server AI cloud (Status: ' . $response->status() . ')'],
             ];
 
         } catch (ConnectionException $e) {
@@ -213,7 +203,7 @@ class ScanController extends Controller
             ];
         } catch (\Exception $e) {
             return [
-                ['error' => 'Error koneksi AI: '.$e->getMessage().'. Pastikan Space hf.co aktif.'],
+                ['error' => 'Error koneksi AI: ' . $e->getMessage() . '. Pastikan Space hf.co aktif.'],
             ];
         }
     }
@@ -228,7 +218,6 @@ class ScanController extends Controller
             ];
         }
 
-        // Urutkan item berdasarkan skor kecocokan (score) tertinggi ke terendah
         usort($items, function ($a, $b) {
             $scoreA = $a['score'] ?? 0;
             $scoreB = $b['score'] ?? 0;
@@ -242,8 +231,8 @@ class ScanController extends Controller
         $parsed = [];
         foreach ($items as $item) {
             $parsed[] = [
-                'key' => $item['label'],
-                'analisis' => $this->beautifyLabel($item['label']),
+                'key'        => $item['label'],
+                'analisis'   => $this->beautifyLabel($item['label']),
                 'confidence' => (float) ($item['score'] ?? 0.0),
             ];
         }
