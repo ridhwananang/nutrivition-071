@@ -139,3 +139,114 @@ Suite pengujian saat ini mencakup 44 kasus uji yang mencakup:
 * **Weekly & Monthly Historical Aggregates:** Menguji kebenaran algoritma visualisasi grafik mingguan dan bulanan agar terhindar dari bias data zona waktu lokal.
 * **Multi-item Detection Storage:** Memastikan jika API mendeteksi lebih dari satu item makanan, relasi database Eloquent menyimpan setiap record gizi secara individu dan memformat nama gabungannya secara rapi.
 * **Authentication & 2FA Flow:** Menjamin keamanan alur login, pendaftaran akun baru, konfirmasi kata sandi, serta integrasi Google OAuth.
+
+---
+
+## 🧠 Dokumentasi Model & Chatbot
+
+Bagian ini menambahkan informasi baru terkait sumber model, cara model dipakai oleh aplikasi NutriVision, serta mekanisme chatbot yang saat ini digunakan.
+
+### Google Drive Full Model Assets
+
+Untuk aset model lengkap dan file mentahan pengembangan model, gunakan Google Drive berikut:
+
+<https://drive.google.com/drive/folders/18IcDLcms48ljtpJn9aMkk88pGsJ2TkbT?usp=sharing>
+
+Folder ini ditujukan untuk kebutuhan seperti:
+
+* artifact training mentah
+* `tfrecord`
+* `saved_model`
+* file pendukung eksperimen atau reproduksi pelatihan
+
+### Hugging Face Ready-to-Use Models
+
+Untuk model yang siap dipakai atau di-download langsung untuk inference, gunakan repository berikut:
+
+<https://huggingface.co/galihkjaya/nutrivision-models>
+
+Repository Hugging Face ini dipakai oleh implementasi inference untuk mengambil file seperti:
+
+* `brand_map.json`
+* `item_map.json`
+* `brand_saved_model`
+* `menu_saved_model`
+
+### Mekanisme Penggunaan Model di Aplikasi Ini
+
+Penggunaan model pada NutriVision saat ini berfokus pada alur aplikasi, bukan sebagai package terpisah.
+
+1. Pengguna mengunggah foto makanan dari aplikasi web.
+2. Frontend mengirim gambar ke endpoint `POST /api/scan`.
+3. Laravel memvalidasi file lalu meneruskan gambar ke service inference pada endpoint `/predict`.
+4. Service inference menjalankan klasifikasi brand dan deteksi item makanan.
+5. Hasil model dikembalikan dalam format label seperti `mcd-frenchfries` atau `kfc-friedchicken`.
+6. Backend mencocokkan label tersebut ke kolom `key` pada tabel `nutrition`.
+7. Sistem menghitung total kalori dan makronutrien berdasarkan `serving_qty`.
+8. Hasil scan disimpan ke tabel `result` dan dikirim kembali ke frontend.
+
+Implementasi saat ini mengacu pada:
+
+* [inference.py](/d:/Kuliah/Bootcamp/DBS%20CC26/Capstone%20Project/nutrivition-071/inference.py) untuk proses load model dan inference
+* [app/Http/Controllers/Api/ScanController.php](/d:/Kuliah/Bootcamp/DBS%20CC26/Capstone%20Project/nutrivition-071/app/Http/Controllers/Api/ScanController.php) untuk integrasi backend Laravel dengan service inference
+
+### Menjalankan Service Inference Secara Lokal
+
+Jika ingin mencoba service inference yang sama secara lokal:
+
+1. Siapkan environment Python terpisah.
+2. Install dependensi yang diperlukan.
+3. Jalankan:
+
+```bash
+python inference.py
+```
+
+Secara default service akan berjalan di port `7860`. Jika ingin dipakai oleh aplikasi lokal, endpoint inference pada `ScanController` perlu diarahkan ke service lokal tersebut.
+
+### Folder `ml-model`
+
+Folder [ml-model](/d:/Kuliah/Bootcamp/DBS%20CC26/Capstone%20Project/nutrivition-071/ml-model) disediakan untuk menyimpan aset pengembangan model yang aman dimasukkan ke repository aplikasi, seperti:
+
+* notebook eksperimen atau training
+* daftar dependensi Python di [ml-model/requirements.txt](/d:/Kuliah/Bootcamp/DBS%20CC26/Capstone%20Project/nutrivition-071/ml-model/requirements.txt)
+
+Notebook yang saat ini disertakan:
+
+* [\[CC26\]_Nutrivision_Model.ipynb](</d:/Kuliah/Bootcamp/DBS%20CC26/Capstone%20Project/nutrivition-071/ml-model/[CC26]_Nutrivision_Model.ipynb>)
+
+Catatan:
+
+* file model besar, dataset, `tfrecord`, dan artefak training lengkap tetap lebih aman diletakkan di Google Drive atau Hugging Face
+* pendekatan ini menjaga repository aplikasi tetap lebih ringan untuk deployment Laravel Cloud
+
+### Chatbot yang Digunakan
+
+NutriVision menggunakan chatbot internal bernama **NutriBot AI**.
+
+Cara kerjanya saat ini:
+
+1. Frontend mengirim pesan pengguna ke endpoint `POST /api/chat`.
+2. Laravel menyusun *system prompt* khusus NutriVision.
+3. Backend memanggil Groq Chat Completions API.
+4. Sistem mencoba fallback model berikut:
+   * `llama-3.3-70b-versatile`
+   * `llama-3.1-8b-instant`
+   * `gemma2-9b-it`
+5. Jika pengguna login, chatbot dapat memanfaatkan ringkasan riwayat scan terbaru untuk memberi saran yang lebih personal.
+
+Implementasi chatbot saat ini dapat dilihat di:
+
+* [resources/js/components/AiChatbot.tsx](/d:/Kuliah/Bootcamp/DBS%20CC26/Capstone%20Project/nutrivition-071/resources/js/components/AiChatbot.tsx)
+* [app/Http/Controllers/ChatController.php](/d:/Kuliah/Bootcamp/DBS%20CC26/Capstone%20Project/nutrivition-071/app/Http/Controllers/ChatController.php)
+
+Ruang lingkup chatbot saat ini berfokus pada:
+
+* edukasi nutrisi dan kalori
+* penjelasan fitur NutriVision
+* saran umum terkait diet, makanan, dan aktivitas
+* respons kontekstual berbasis riwayat scan pengguna
+
+### Catatan Deployment
+
+Penambahan folder `ml-model` di repository ini ditujukan untuk dokumentasi dan aset ringan seperti notebook serta daftar dependensi. Folder ini tidak dipakai langsung oleh runtime web Laravel kecuali di masa depan ditambahkan integrasi baru yang memang memanggil aset tersebut.
