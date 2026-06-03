@@ -185,70 +185,47 @@ export default function FoodScanner({
                         )}
 
                         {/* Form Fields */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5 text-left">
-                                <InputLabel
-                                    htmlFor="meal_type"
-                                    value="Waktu Makan"
-                                />
-                                <Select
-                                    value={scanForm.data.meal_type}
-                                    onValueChange={(val: any) =>
-                                        scanForm.setData('meal_type', val)
-                                    }
-                                >
-                                    <SelectTrigger className="cursor-pointer rounded-2xl border-slate-200 bg-white px-4 py-3 text-xs capitalize shadow-xs focus:border-amber-500 focus:ring-amber-500">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem
-                                            value="breakfast"
-                                            className="cursor-pointer"
-                                        >
-                                            Sarapan
-                                        </SelectItem>
-                                        <SelectItem
-                                            value="lunch"
-                                            className="cursor-pointer"
-                                        >
-                                            Makan Siang
-                                        </SelectItem>
-                                        <SelectItem
-                                            value="dinner"
-                                            className="cursor-pointer"
-                                        >
-                                            Makan Malam
-                                        </SelectItem>
-                                        <SelectItem
-                                            value="snack"
-                                            className="cursor-pointer"
-                                        >
-                                            Cemilan
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="space-y-1.5 text-left">
-                                <InputLabel
-                                    htmlFor="serving_qty"
-                                    value="Jumlah Porsi"
-                                />
-                                <Input
-                                    id="serving_qty"
-                                    type="number"
-                                    min="0.1"
-                                    step="0.1"
-                                    value={scanForm.data.serving_qty}
-                                    onChange={(e) =>
-                                        scanForm.setData(
-                                            'serving_qty',
-                                            parseFloat(e.target.value) || 1,
-                                        )
-                                    }
-                                    className="rounded-2xl border-slate-200 bg-white px-4 py-3 text-xs font-bold shadow-xs focus:border-amber-500 focus:ring-amber-500"
-                                />
-                            </div>
+                        <div className="space-y-1.5 text-left">
+                            <InputLabel
+                                htmlFor="meal_type"
+                                value="Waktu Makan"
+                            />
+                            <Select
+                                value={scanForm.data.meal_type}
+                                onValueChange={(val: any) =>
+                                    scanForm.setData('meal_type', val)
+                                }
+                            >
+                                <SelectTrigger className="cursor-pointer rounded-2xl border-slate-200 bg-white px-4 py-3 text-xs capitalize shadow-xs focus:border-amber-500 focus:ring-amber-500">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem
+                                        value="breakfast"
+                                        className="cursor-pointer"
+                                    >
+                                        Sarapan
+                                    </SelectItem>
+                                    <SelectItem
+                                        value="lunch"
+                                        className="cursor-pointer"
+                                    >
+                                        Makan Siang
+                                    </SelectItem>
+                                    <SelectItem
+                                        value="dinner"
+                                        className="cursor-pointer"
+                                    >
+                                        Makan Malam
+                                    </SelectItem>
+                                    <SelectItem
+                                        value="snack"
+                                        className="cursor-pointer"
+                                    >
+                                        Cemilan
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
 
