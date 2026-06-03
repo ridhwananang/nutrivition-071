@@ -8,6 +8,7 @@ interface ScanItem {
     serving_qty: number;
     confidence: number;
     total_calories: number;
+    analisis_ai?: string;
     nutrition?: {
         item: string;
         calories: number;
@@ -24,114 +25,173 @@ interface RecentScansProps {
     onDelete: (id: number) => void;
 }
 
-export default function RecentScans({ scans, consumed, totalScans, onDelete }: RecentScansProps) {
+export default function RecentScans({
+    scans,
+    consumed,
+    totalScans,
+    onDelete,
+}: RecentScansProps) {
     const mealTypeColors = {
-        breakfast: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300',
+        breakfast:
+            'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300',
         lunch: 'bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-300',
         dinner: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-300',
-        snack: 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300'
+        snack: 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300',
     };
-    
+
     const mealLabels = {
         breakfast: 'Sarapan',
         lunch: 'Makan Siang',
         dinner: 'Makan Malam',
-        snack: 'Cemilan'
+        snack: 'Cemilan',
     };
 
     return (
-        <div className="shadow-xl border border-slate-100 dark:border-neutral-800 rounded-[2.5rem] bg-white dark:bg-neutral-950 flex flex-col justify-between p-6 sm:p-8 relative overflow-hidden">
+        <div className="relative flex flex-col justify-between overflow-hidden rounded-[2.5rem] border border-slate-100 bg-white p-6 shadow-xl sm:p-8 dark:border-neutral-800 dark:bg-neutral-950">
             {/* Visual glowing frame background */}
-            <div className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-amber-100 dark:bg-amber-950/20 opacity-30 blur-3xl"></div>
-            
+            <div className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-amber-100 opacity-30 blur-3xl dark:bg-amber-950/20"></div>
+
             <div>
                 <div className="pb-6">
-                    <h3 className="text-lg font-black tracking-tight text-slate-800 dark:text-white uppercase italic flex items-center gap-2">
-                        <Utensils className="w-5 h-5 text-amber-500" />
+                    <h3 className="flex items-center gap-2 text-lg font-black tracking-tight text-slate-800 uppercase italic dark:text-white">
                         <span>Makanan Hari Ini</span>
                     </h3>
-                    <p className="text-xs font-semibold text-slate-500 dark:text-neutral-400 mt-1">Makanan yang telah dipindai dan dikonsumsi pada hari ini.</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500 dark:text-neutral-400">
+                        Makanan yang telah dipindai dan dikonsumsi pada hari
+                        ini.
+                    </p>
                 </div>
-                
-                <div className="overflow-y-auto max-h-[300px] space-y-4 px-2">
+
+                <div className="max-h-[300px] space-y-4 overflow-y-auto px-2">
                     {scans.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-center py-10 space-y-2">
-                            <div className="p-3.5 bg-slate-50 dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 rounded-full">
-                                <Apple className="w-6 h-6 text-slate-400" />
+                        <div className="flex h-full flex-col items-center justify-center space-y-2 py-10 text-center">
+                            <div className="rounded-full border border-slate-100 bg-slate-50 p-3.5 dark:border-neutral-800 dark:bg-neutral-900">
+                                <Apple className="h-6 w-6 text-slate-400" />
                             </div>
-                            <p className="text-xs font-bold text-slate-800 dark:text-white">Belum ada makanan hari ini</p>
-                            <p className="text-[10px] font-semibold text-slate-400 max-w-[280px]">Gunakan panel sebelah kiri untuk memindai asupan pertama Anda!</p>
+                            <p className="text-xs font-bold text-slate-800 dark:text-white">
+                                Belum ada makanan hari ini
+                            </p>
+                            <p className="max-w-[280px] text-[10px] font-semibold text-slate-400">
+                                Gunakan panel sebelah kiri untuk memindai asupan
+                                pertama Anda!
+                            </p>
                         </div>
                     ) : (
                         <div className="divide-y divide-slate-100 dark:divide-neutral-800">
                             {scans.map((scan) => {
                                 return (
-                                    <div key={scan.id} className="flex items-center justify-between py-3.5 gap-4 group">
+                                    <div
+                                        key={scan.id}
+                                        className="group flex items-center justify-between gap-4 py-3.5"
+                                    >
                                         <div className="flex items-center gap-3">
                                             {/* Scan Image Thumbnail */}
-                                            <div className="w-12 h-12 bg-slate-50 dark:bg-neutral-900 rounded-xl overflow-hidden border border-slate-100 dark:border-neutral-850 flex-shrink-0 flex items-center justify-center">
+                                            <div className="dark:border-neutral-850 flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-50 dark:bg-neutral-900">
                                                 {scan.scan_image ? (
-                                                    <img 
-                                                        src={`/storage/${scan.scan_image}`} 
-                                                        alt={scan.nutrition?.item || 'Food'} 
-                                                        className="w-full h-full object-cover"
+                                                    <img
+                                                        src={`/storage/${scan.scan_image}`}
+                                                        alt={
+                                                            scan.nutrition
+                                                                ?.item || 'Food'
+                                                        }
+                                                        className="h-full w-full object-cover"
                                                         onError={(e) => {
-                                                            (e.target as HTMLImageElement).src = '/images/placeholder-food.png';
+                                                            (
+                                                                e.target as HTMLImageElement
+                                                            ).src =
+                                                                '/images/placeholder-food.png';
                                                         }}
                                                     />
                                                 ) : (
-                                                    <Apple className="w-6 h-6 text-slate-300" />
+                                                    <Apple className="h-6 w-6 text-slate-300" />
                                                 )}
                                             </div>
-                                            
+
                                             {/* Food Name & Details */}
                                             <div className="space-y-1">
-                                                <h4 className="text-sm font-bold text-slate-800 dark:text-white leading-tight">
-                                                    {scan.nutrition?.item || 'Makanan Tidak Dikenal'}
+                                                <h4 className="text-sm leading-tight font-bold text-slate-800 dark:text-white">
+                                                    {scan.nutrition?.item ||
+                                                        'Makanan Tidak Dikenal'}
                                                 </h4>
-                                                <div className="flex items-center gap-2 flex-wrap">
-                                                    <span className={`text-[9px] py-0.5 px-2 font-black uppercase tracking-wider rounded-md ${mealTypeColors[scan.meal_type as keyof typeof mealTypeColors] || 'bg-slate-100 text-slate-700'}`}>
-                                                        {mealLabels[scan.meal_type as keyof typeof mealLabels] || scan.meal_type}
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <span
+                                                        className={`rounded-md px-2 py-0.5 text-[9px] font-black tracking-wider uppercase ${mealTypeColors[scan.meal_type as keyof typeof mealTypeColors] || 'bg-slate-100 text-slate-700'}`}
+                                                    >
+                                                        {mealLabels[
+                                                            scan.meal_type as keyof typeof mealLabels
+                                                        ] || scan.meal_type}
                                                     </span>
-                                                    <span className="text-[9px] text-slate-400 font-bold">
+                                                    <span className="text-[9px] font-bold text-slate-400">
                                                         {scan.serving_qty} porsi
                                                     </span>
-                                                    <span className="text-[9px] text-amber-600 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
-                                                        {Math.round(scan.confidence * 100)}% AI
+                                                    <span className="rounded-md bg-amber-50 px-2 py-0.5 text-[9px] font-bold text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
+                                                        {Math.round(
+                                                            scan.confidence *
+                                                                100,
+                                                        )}
+                                                        % AI
                                                     </span>
                                                 </div>
                                                 {scan.nutrition && (
-                                                    <div className="flex items-center gap-1.5 text-[9px] font-bold mt-1.5 flex-wrap">
-                                                        <span className="bg-red-50 dark:bg-red-950/30 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded-md">
-                                                            {Math.round(scan.nutrition.calories * scan.serving_qty)} kkal
+                                                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[9px] font-bold">
+                                                        <span className="rounded-md bg-red-50 px-1.5 py-0.5 text-rose-600 dark:bg-red-950/30 dark:text-rose-400">
+                                                            {Math.round(
+                                                                scan.nutrition
+                                                                    .calories *
+                                                                    scan.serving_qty,
+                                                            )}{' '}
+                                                            kkal
                                                         </span>
-                                                        <span className="bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 px-1.5 py-0.5 rounded-md">
-                                                            P: {Math.round(scan.nutrition.protein * scan.serving_qty)}g
+                                                        <span className="rounded-md bg-orange-50 px-1.5 py-0.5 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400">
+                                                            P:{' '}
+                                                            {Math.round(
+                                                                scan.nutrition
+                                                                    .protein *
+                                                                    scan.serving_qty,
+                                                            )}
+                                                            g
                                                         </span>
-                                                        <span className="bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-md">
-                                                            K: {Math.round(scan.nutrition.carbs * scan.serving_qty)}g
+                                                        <span className="rounded-md bg-blue-50 px-1.5 py-0.5 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400">
+                                                            K:{' '}
+                                                            {Math.round(
+                                                                scan.nutrition
+                                                                    .carbs *
+                                                                    scan.serving_qty,
+                                                            )}
+                                                            g
                                                         </span>
-                                                        <span className="bg-emerald-50 dark:bg-emerald-600 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded-md">
-                                                            L: {Math.round(scan.nutrition.fat * scan.serving_qty)}g
+                                                        <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-emerald-600 dark:bg-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400">
+                                                            L:{' '}
+                                                            {Math.round(
+                                                                scan.nutrition
+                                                                    .fat *
+                                                                    scan.serving_qty,
+                                                            )}
+                                                            g
                                                         </span>
                                                     </div>
+                                                )}
+                                                {scan.analisis_ai && (
+                                                    <p className="mt-2.5 rounded-r-xl border-l-2 border-amber-500 bg-amber-500/5 py-1.5 pl-2.5 pr-2 text-[10px] font-semibold leading-relaxed italic text-slate-650 dark:text-neutral-350">
+                                                        <strong className="mr-1 text-[8px] font-black tracking-wider text-amber-600 uppercase dark:text-amber-450">
+                                                            Saran:
+                                                        </strong>
+                                                        {scan.analisis_ai}
+                                                    </p>
                                                 )}
                                             </div>
                                         </div>
 
                                         <div className="flex items-center gap-3">
-                                            <div className="text-right">
-                                                <span className="text-sm font-black text-amber-500 block">+{Math.round(scan.total_calories)}</span>
-                                                <span className="text-[9px] font-bold text-slate-400 block uppercase">kkal</span>
-                                            </div>
-                                            
-                                            <button 
-                                                type="button" 
-                                                onClick={() => onDelete(scan.id)}
-                                                className="w-8 h-8 rounded-xl text-slate-450 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-colors flex items-center justify-center cursor-pointer"
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    onDelete(scan.id)
+                                                }
+                                                className="text-slate-450 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950"
                                                 title="Hapus Makanan"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="h-4 w-4" />
                                             </button>
                                         </div>
                                     </div>
@@ -142,9 +202,13 @@ export default function RecentScans({ scans, consumed, totalScans, onDelete }: R
                 </div>
             </div>
 
-            <div className="border-t border-slate-100 dark:border-neutral-800 mt-6 pt-4 flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-500">
-                <span>Scan Hari Ini: <strong className="text-slate-800 dark:text-white">{totalScans} Kali</strong></span>
-                <span>Total Kalori: <strong className="text-amber-500">{consumed} kkal</strong></span>
+            <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-[10px] font-black tracking-wider text-slate-500 uppercase dark:border-neutral-800">
+                <span>
+                    Scan Hari Ini:{' '}
+                    <strong className="text-slate-800 dark:text-white">
+                        {totalScans} Kali
+                    </strong>
+                </span>
             </div>
         </div>
     );

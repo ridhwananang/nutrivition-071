@@ -55,6 +55,7 @@ export default function Register() {
                                         id="name"
                                         type="text"
                                         name="name"
+                                        placeholder="Nama lengkap Anda"
                                         className="block w-full focus:border-amber-500 focus:ring-amber-500"
                                         autoComplete="name"
                                         isFocused={true}
@@ -70,6 +71,7 @@ export default function Register() {
                                         id="email"
                                         type="email"
                                         name="email"
+                                        placeholder="nama@email.com"
                                         className="block w-full focus:border-amber-500 focus:ring-amber-500"
                                         autoComplete="email"
                                         required
@@ -87,6 +89,7 @@ export default function Register() {
                                         id="password"
                                         type="password"
                                         name="password"
+                                        placeholder="Min. 8 karakter"
                                         className="block w-full focus:border-amber-500 focus:ring-amber-500"
                                         autoComplete="new-password"
                                         required
@@ -104,6 +107,7 @@ export default function Register() {
                                         id="password_confirmation"
                                         type="password"
                                         name="password_confirmation"
+                                        placeholder="Ulangi kata sandi baru"
                                         className="block w-full focus:border-amber-500 focus:ring-amber-500"
                                         autoComplete="new-password"
                                         required
@@ -116,7 +120,7 @@ export default function Register() {
                                 {/* Action buttons */}
                                 <div className="space-y-3 pt-2">
                                     <PrimaryButton
-                                        className="flex w-full justify-center text-center text-xs font-black tracking-widest uppercase animate-pulse"
+                                        className="flex w-full justify-center text-center text-xs font-black tracking-widest uppercase"
                                         disabled={processing}
                                     >
                                         {processing

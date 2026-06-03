@@ -8,7 +8,7 @@ import WelcomeHeader from '@/components/dashboard/welcome-header';
 import NutritionProgress from '@/components/dashboard/nutrition-progress';
 import FoodScanner from '@/components/dashboard/food-scanner';
 import RecentScans from '@/components/dashboard/recent-scans';
-import WeeklyStats from '@/components/dashboard/weekly-stats';
+import AiHealthTips from '@/components/dashboard/ai-health-tips';
 
 interface Macro {
     value: number;
@@ -36,16 +36,6 @@ interface DashboardData {
     };
 }
 
-interface WeeklyDayData {
-    date: string;
-    day: string;
-    total_calories: number;
-    total_protein: number;
-    total_carbs: number;
-    total_fat: number;
-    scan_count: number;
-}
-
 export default function Dashboard() {
     const { auth } = usePage().props as { auth: { user: { name: string; email: string } } };
     const { submit } = useHttp();
@@ -53,7 +43,6 @@ export default function Dashboard() {
     // States
     const [isLoading, setIsLoading] = useState(true);
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-    const [weeklyStats, setWeeklyStats] = useState<WeeklyDayData[]>([]);
     
     // Scanner Upload State
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -86,10 +75,6 @@ export default function Dashboard() {
             // Load dashboard stats
             const dashRes = await submit(Api.DashboardController.index()) as { data: DashboardData };
             setDashboardData(dashRes.data);
-
-            // Load 7-day weekly stats
-            const statsRes = await submit(Api.StatsController.weekly()) as { data: WeeklyDayData[] };
-            setWeeklyStats(statsRes.data);
         } catch (e) {
             console.error('Failed to load dashboard data:', e);
             toast.error('Gagal memuat data dashboard.');
@@ -237,9 +222,6 @@ export default function Dashboard() {
     // Total Calories Consumed
     const consumed = dashboardData?.summary?.total_calories ?? 0;
 
-    // Max calories scaling for custom SVG chart
-    const maxCalories = Math.max(...weeklyStats.map(d => d.total_calories), 2000);
-
     if (isLoading && !dashboardData) {
         return (
             <div className="flex flex-col gap-6 p-6 h-full flex-1 justify-center items-center min-h-[400px]">
@@ -279,16 +261,7 @@ export default function Dashboard() {
                 {/* Header Welcome */}
                 <WelcomeHeader userName={auth.user.name} />
 
-                {/* Row 1: Summary ring and macros */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <NutritionProgress 
-                        consumed={consumed} 
-                        calorieGoal={dashboardData?.calorie_goal ?? 2000} 
-                        macros={dashboardData?.macros} 
-                    />
-                </div>
-
-                {/* Row 2: Scan AI Form and Recent Scans list */}
+                {/* Row 1: Scan AI Form and Recent Scans list */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <FoodScanner 
                         scanForm={scanForm}
@@ -314,11 +287,17 @@ export default function Dashboard() {
                     />
                 </div>
 
-                {/* Row 3: Weekly SVG Bar Chart */}
-                <WeeklyStats 
-                    stats={weeklyStats} 
-                    maxCalories={maxCalories} 
-                />
+                {/* Row 2: Summary ring and macros */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <NutritionProgress 
+                        consumed={consumed} 
+                        calorieGoal={dashboardData?.calorie_goal ?? 2000} 
+                        macros={dashboardData?.macros} 
+                    />
+                </div>
+
+                {/* Row 3: AI Daily Health & Nutrition Tips Carousel */}
+                <AiHealthTips />
 
             </div>
         </>

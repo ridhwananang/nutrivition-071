@@ -50,11 +50,20 @@ class ScanController extends Controller
             if ($nutrition) {
                 $totalCalories = $nutrition->calories * $servingQty;
 
+                $aiAdvice = $this->generateNutritionAdvice(
+                    $nutrition->brand,
+                    $nutrition->item,
+                    $totalCalories,
+                    floatval($nutrition->protein) * $servingQty,
+                    floatval($nutrition->carbs) * $servingQty,
+                    floatval($nutrition->fat) * $servingQty
+                );
+
                 $result = $this->scanRepository->storeScan([
                     'user_id'        => $request->user()->id,
                     'nutrition_id'   => $nutrition->id,
                     'scan_image'     => $path,
-                    'analisis_ai'    => $item['analisis'],
+                    'analisis_ai'    => $aiAdvice,
                     'confidence'     => $item['confidence'],
                     'serving_qty'    => $servingQty,
                     'total_calories' => $totalCalories,
@@ -238,5 +247,77 @@ class ScanController extends Controller
         }
 
         return $parsed;
+    }
+
+    private function generateNutritionAdvice(string $brand, string $item, float $calories, float $protein, float $carbs, float $fat): string
+    {
+        $groqApiKey = env('GROQ_API_KEY');
+        if (empty($groqApiKey)) {
+            return $this->getDefaultAdvice($brand, $item, $calories, $protein, $carbs, $fat);
+        }
+
+        $prompt = "Kamu adalah asisten gizi cerdas NutriVision. Berikan 1 atau 2 kalimat saran gizi yang sehat, spesifik, dan padat untuk pengguna setelah mereka makan hidangan berikut:
+Nama Makanan: " . strtoupper($brand) . " - " . ucwords(str_replace('-', ' ', $item)) . "
+Detail Nutrisi: {$calories} kkal, Protein: {$protein}g, Karbohidrat: {$carbs}g, Lemak: {$fat}g.
+
+ATURAN OUTPUT:
+1. JAWAB LANGSUNG dengan saran gizi dalam 1-2 kalimat saja.
+2. JANGAN sertakan basa-basi perkenalan seperti 'Berikut adalah...', 'Tentu, ini...', 'Saran gizi:', atau pengantar serupa.
+3. JANGAN gunakan bullet points (-) atau tanda bintang (*).
+4. JANGAN sertakan tulisan 'Analisis singkat:' atau meta data lainnya di bagian akhir.
+5. Gunakan Bahasa Indonesia yang ramah, santun, dan natural.";
+
+        try {
+            $response = Http::timeout(6)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $groqApiKey,
+                    'Content-Type' => 'application/json',
+                ])
+                ->post('https://api.groq.com/openai/v1/chat/completions', [
+                    'model' => 'llama-3.1-8b-instant',
+                    'messages' => [
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'max_tokens' => 120,
+                    'temperature' => 0.6,
+                ]);
+
+            if ($response->successful()) {
+                $advice = trim($response->json('choices.0.message.content'));
+                
+                // Regex cleaning to strip any conversational fluff
+                $advice = preg_replace('/^(Berikut adalah|Tentu saja,|Tentu,|Ini adalah|Saran gizi|Saran|Tips gizi|Tips|Rekomendasi)\s*.*:\s*/i', '', $advice);
+                $advice = preg_replace('/^\s*[-*•]\s*/', '', $advice); // remove bullet points at start
+                $advice = preg_replace('/\s*[-*•]\s+/', ' ', $advice); // convert inline bullets to space
+                $advice = preg_replace('/Analisis singkat.*$/i', '', $advice); // remove trailing metadata
+                $advice = trim($advice);
+                
+                if (!empty($advice)) {
+                    return $advice;
+                }
+            }
+        } catch (\Exception $e) {
+            // Fallback on error
+        }
+
+        return $this->getDefaultAdvice($brand, $item, $calories, $protein, $carbs, $fat);
+    }
+
+    private function getDefaultAdvice(string $brand, string $item, float $calories, float $protein, float $carbs, float $fat): string
+    {
+        $cleanBrand = strtoupper($brand);
+        $cleanItem = ucwords(str_replace('-', ' ', $item));
+        
+        $base = "Menu {$cleanBrand} {$cleanItem} mengandung {$calories} kkal (P: {$protein}g, K: {$carbs}g, L: {$fat}g).";
+
+        if ($protein < 12) {
+            return $base . " Kandungan proteinnya cukup rendah, sebaiknya imbangi dengan asupan tinggi protein seperti telur atau dada ayam pada makan berikutnya.";
+        }
+        
+        if ($fat > 20) {
+            return $base . " Kandungan lemaknya cukup tinggi, pastikan untuk membatasi makanan berminyak di sisa hari ini dan perbanyak minum air putih.";
+        }
+
+        return $base . " Porsi gizi cukup standar, pertahankan keseimbangan dengan porsi serat dari sayuran dan buah segar.";
     }
 }

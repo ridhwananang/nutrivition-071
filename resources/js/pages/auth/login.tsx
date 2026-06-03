@@ -74,6 +74,7 @@ export default function Login({
                                         id="email"
                                         type="email"
                                         name="email"
+                                        placeholder="nama@email.com"
                                         className="block w-full focus:border-amber-500 focus:ring-amber-500"
                                         autoComplete="email"
                                         isFocused={true}
@@ -102,6 +103,7 @@ export default function Login({
                                         id="password"
                                         type="password"
                                         name="password"
+                                        placeholder="Masukkan kata sandi Anda"
                                         className="block w-full focus:border-amber-500 focus:ring-amber-500"
                                         autoComplete="current-password"
                                         required
@@ -124,7 +126,7 @@ export default function Login({
                                 {/* Action buttons */}
                                 <div className="space-y-3">
                                     <PrimaryButton
-                                        className="flex w-full justify-center text-center text-xs font-black tracking-widest uppercase animate-pulse"
+                                        className="flex w-full justify-center text-center text-xs font-black tracking-widest uppercase"
                                         disabled={processing}
                                     >
                                         {processing
