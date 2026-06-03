@@ -7,18 +7,27 @@ interface HeroSectionProps {
     handleScrollToSection: (id: string) => void;
 }
 
-export default function HeroSection({ handleScrollToSection }: HeroSectionProps) {
+export default function HeroSection({
+    handleScrollToSection,
+}: HeroSectionProps) {
     return (
         <section
             id="hero"
             className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-amber-700 pt-12 pb-24 text-white shadow-inner"
         >
+            {/* Custom Scan Animation for Hero Mockup */}
+            <style dangerouslySetInnerHTML={{__html: `
+                @keyframes hero-scan {
+                    0%, 100% { top: 4%; opacity: 0.3; }
+                    50% { top: 96%; opacity: 0.9; }
+                }
+            `}} />
+
             <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
                 <div className="z-10 space-y-6">
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-4 py-2 backdrop-blur-md">
-                        <span className="h-2 w-2 animate-ping rounded-full bg-amber-300"></span>
                         <span className="text-xs font-bold tracking-widest uppercase">
-                            Nutrivision Engine v1.0
+                            Nutrivision: Fast-food Detection & Nutrition
                         </span>
                     </div>
                     <h1 className="text-4xl leading-[1.1] font-extrabold tracking-tight uppercase italic sm:text-5xl lg:text-7xl">
@@ -26,8 +35,9 @@ export default function HeroSection({ handleScrollToSection }: HeroSectionProps)
                         Dalam Sekejap.
                     </h1>
                     <p className="max-w-sm text-sm leading-relaxed opacity-90 sm:max-w-md sm:text-lg">
-                        Sistem deteksi makanan berbasis kecerdasan komputasi. Pantau
-                        kalori, lemak, dan protein melalui jepretan kamera Anda secara real-time.
+                        Sistem deteksi makanan berbasis kecerdasan komputasi.
+                        Pantau kalori, lemak, dan protein melalui jepretan
+                        kamera Anda secara real-time.
                     </p>
 
                     <div className="flex flex-wrap gap-4 pt-2">
@@ -56,7 +66,12 @@ export default function HeroSection({ handleScrollToSection }: HeroSectionProps)
                                 alt="Visual Burger"
                             />
                             {/* Sensor Kamera Pemindai */}
-                            <div className="absolute top-0 right-0 left-0 h-1 animate-bounce bg-amber-400 shadow-xl"></div>
+                            <div
+                                className="absolute left-2 right-2 h-0.5 rounded-full bg-amber-400 shadow-[0_0_8px_#f59e0b]"
+                                style={{
+                                    animation: 'hero-scan 3s ease-in-out infinite',
+                                }}
+                            />
                         </div>
 
                         <div className="absolute right-6 bottom-6 left-6 flex items-center gap-3 rounded-xl border border-white/20 bg-amber-500/90 p-3 shadow-lg backdrop-blur-md sm:right-10 sm:bottom-10 sm:left-10 sm:gap-4 sm:rounded-2xl sm:p-4">

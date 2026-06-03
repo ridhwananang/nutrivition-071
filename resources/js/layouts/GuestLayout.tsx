@@ -186,21 +186,6 @@ export default function GuestLayout({
                                 © 2026 Nutrivision Indonesia. Seluruh hak cipta
                                 dilindungi.
                             </p>
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-600">
-                                    <span>LARAVEL: {laravelVersion}</span>
-                                    <span>•</span>
-                                    <span>PHP: {phpVersion}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-bold text-slate-600">
-                                        POWERED BY
-                                    </span>
-                                    <span className="text-[10px] font-black tracking-widest text-slate-400 italic">
-                                        NUTRIVISION ENGINE
-                                    </span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </footer>

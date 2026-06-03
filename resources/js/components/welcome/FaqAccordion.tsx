@@ -6,20 +6,20 @@ export default function FaqAccordion() {
 
     const faqItems = [
         {
-            q: 'Bagaimana cara kerja teknologi visual AI Nutrivision?',
-            a: 'Teknologi kami memproses foto piring makanan Anda menggunakan pengenalan objek gizi canggih yang terbimbing pada basis data pangan Indonesia. AI mendeteksi komponen bahan secara instan untuk memperkirakan komposisinya.',
+            q: 'Bagaimana cara kerja deteksi makanan berbasis AI pada Nutrivision?',
+            a: 'Nutrivision menggunakan teknologi pengenalan gambar berbasis kecerdasan buatan (AI) yang diintegrasikan dengan basis data kandungan gizi pangan Indonesia. Sistem akan menganalisis foto makanan yang diunggah untuk mengidentifikasi jenis makanan dan mengestimasi nilai nutrisinya secara instan.',
         },
         {
-            q: 'Apakah estimasi kalorinya akurasi tinggi?',
-            a: 'Ya! Estimasi dikalibrasi mendekati standar AKG Indonesia dengan margin galat rendah untuk porsi makan rata-rata. Anda juga bisa menyesuaikan berat porsi jika merasa porsinya khusus.',
+            q: 'Seberapa akurat estimasi kalori dan nutrisi yang diberikan?',
+            a: 'Estimasi nilai gizi dikalibrasi berdasarkan standar Angka Kecukupan Gizi (AKG) Indonesia dengan tingkat akurasi yang optimal untuk porsi makanan rata-rata. Untuk hasil terbaik, pastikan foto makanan terlihat jelas dan terfokus saat dipindai.',
         },
         {
-            q: 'Teknologi apa saja yang digunakan untuk membangun sistem ini?',
-            a: 'Aplikasi ini dikembangkan menggunakan arsitektur modern berbasis Laravel (sebagai RESTful API & Controller) yang terintegrasi secara mulus dengan Inertia.js React di sisi frontend, didukung oleh Tailwind CSS untuk styling responsif, serta AI Engine untuk deteksi gizi.',
+            q: 'Apakah layanan Nutrivision dapat diakses secara gratis?',
+            a: 'Ya, seluruh fitur utama Nutrivision termasuk pemindaian makanan dengan AI, pencatatan asupan gizi harian, serta asisten AI Chatbot dapat diakses dan digunakan secara gratis sepenuhnya.',
         },
         {
-            q: 'Apakah data asupan makanan harian saya tersimpan dengan aman?',
-            a: 'Tentu saja. Seluruh data asupan gizi harian dan data kredensial Anda disimpan secara aman di basis data PostgreSQL menggunakan enkripsi Eloquent ORM Laravel serta sistem proteksi autentikasi yang ketat.',
+            q: 'Bagaimana Nutrivision menjaga keamanan data pribadi saya?',
+            a: 'Kami sangat menjaga privasi dan keamanan informasi Anda. Seluruh data asupan gizi harian serta informasi akun pengguna disimpan secara aman menggunakan protokol enkripsi standar industri dan sistem autentikasi yang ketat.',
         },
     ];
 
@@ -34,7 +34,8 @@ export default function FaqAccordion() {
                         Pertanyaan Umum
                     </h2>
                     <p className="mt-1 text-xs font-semibold text-slate-500 dark:text-neutral-400">
-                        Kami merangkum jawaban atas kebimbangan terselubung Anda
+                        Berikut adalah jawaban atas beberapa pertanyaan yang
+                        paling sering diajukan mengenai layanan kami.
                     </p>
                 </div>
 
@@ -46,7 +47,9 @@ export default function FaqAccordion() {
                         >
                             <button
                                 type="button"
-                                onClick={() => setActiveFaq(activeFaq === i ? null : i)}
+                                onClick={() =>
+                                    setActiveFaq(activeFaq === i ? null : i)
+                                }
                                 className="flex w-full cursor-pointer items-center justify-between px-6 py-5 text-left text-sm font-extrabold text-slate-800 transition-colors hover:text-amber-500 sm:text-base dark:text-white dark:hover:text-amber-400"
                             >
                                 <span>{faq.q}</span>

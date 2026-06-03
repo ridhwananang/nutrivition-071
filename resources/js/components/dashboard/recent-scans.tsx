@@ -8,6 +8,7 @@ interface ScanItem {
     serving_qty: number;
     confidence: number;
     total_calories: number;
+    created_at?: string;
     analisis_ai?: string;
     nutrition?: {
         item: string;
@@ -44,6 +45,21 @@ export default function RecentScans({
         lunch: 'Makan Siang',
         dinner: 'Makan Malam',
         snack: 'Cemilan',
+    };
+
+    const formatDateTime = (dateStr?: string) => {
+        if (!dateStr) return '';
+        try {
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            const month = months[date.getMonth()];
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${day} ${month}, ${hours}:${minutes}`;
+        } catch (e) {
+            return '';
+        }
     };
 
     return (
@@ -131,6 +147,11 @@ export default function RecentScans({
                                                         )}
                                                         % AI
                                                     </span>
+                                                    {scan.created_at && (
+                                                        <span className="rounded-md bg-slate-50 px-2 py-0.5 text-[9px] font-bold text-slate-550 border border-slate-100 dark:bg-neutral-900/50 dark:text-neutral-450 dark:border-neutral-800">
+                                                            {formatDateTime(scan.created_at)}
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 {scan.nutrition && (
                                                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[9px] font-bold">

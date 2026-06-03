@@ -25,8 +25,8 @@ class DashboardController extends Controller
         // Ambil data rangkuman harian dari repositori
         $summary = $this->scanRepository->getDashboardSummary($user->id, $today);
 
-        // Ambil scan terakhir hari ini
-        $recentScans = $this->scanRepository->getDashboardRecentScans($user->id, $today, 5);
+        // Ambil scan terakhir hari ini (tidak dibatasi / limit besar)
+        $recentScans = $this->scanRepository->getDashboardRecentScans($user->id, $today, 100);
 
         // Target kalori default 2000
         $calorieGoal = 2000;
