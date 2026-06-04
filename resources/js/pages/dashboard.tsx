@@ -9,6 +9,7 @@ import NutritionProgress from '@/components/dashboard/nutrition-progress';
 import FoodScanner from '@/components/dashboard/food-scanner';
 import RecentScans from '@/components/dashboard/recent-scans';
 import AiHealthTips from '@/components/dashboard/ai-health-tips';
+import AiDailyAdvice from '@/components/dashboard/ai-daily-advice';
 
 interface Macro {
     value: number;
@@ -29,6 +30,7 @@ interface DashboardData {
         scan_count: number;
     };
     recent_scans: any[];
+    daily_advice?: string;
     macros: {
         protein: Macro;
         carbs: Macro;
@@ -293,6 +295,10 @@ export default function Dashboard() {
                         consumed={consumed} 
                         calorieGoal={dashboardData?.calorie_goal ?? 2000} 
                         macros={dashboardData?.macros} 
+                    />
+                    <AiDailyAdvice 
+                        advice={dashboardData?.daily_advice} 
+                        isLoading={isLoading} 
                     />
                 </div>
 

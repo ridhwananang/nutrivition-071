@@ -8,6 +8,7 @@ use App\Repositories\ScanRepositoryInterface;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class ScanController extends Controller
 {
@@ -124,6 +125,8 @@ class ScanController extends Controller
             'protein'      => (float) $totalProtein,
         ];
 
+        Cache::forget("user_" . $request->user()->id . "_advice_" . now()->toDateString());
+
         return response()->json([
             'status' => 'success',
             'data'   => $responseData,
@@ -157,6 +160,8 @@ class ScanController extends Controller
                 'message' => 'Data scan tidak ditemukan',
             ], 404);
         }
+
+        Cache::forget("user_" . $request->user()->id . "_advice_" . now()->toDateString());
 
         return response()->json([
             'status'  => 'success',

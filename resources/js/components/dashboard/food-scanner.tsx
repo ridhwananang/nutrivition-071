@@ -259,7 +259,6 @@ export default function FoodScanner({
                                 </>
                             ) : (
                                 <>
-                                    <Sparkles className="h-4 w-4 fill-white text-white" />
                                     <span>Pindai Sekarang</span>
                                 </>
                             )}

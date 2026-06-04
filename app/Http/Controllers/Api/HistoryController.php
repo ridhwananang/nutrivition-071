@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\HistoryResource;
 use App\Repositories\ScanRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class HistoryController extends Controller
 {
@@ -56,6 +57,8 @@ class HistoryController extends Controller
                 'message' => 'Data tidak ditemukan',
             ], 404);
         }
+
+        Cache::forget("user_" . $request->user()->id . "_advice_" . now()->toDateString());
 
         return response()->json([
             'status'  => 'success',

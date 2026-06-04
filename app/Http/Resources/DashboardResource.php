@@ -24,6 +24,7 @@ class DashboardResource extends JsonResource
                 'scan_count'     => (int) $data['summary']->scan_count,
             ],
             'recent_scans' => ScanResource::collection($data['recent_scans']),
+            'daily_advice' => $data['daily_advice'] ?? '',
             'macros'       => [
                 'protein' => [
                     'value' => (float) $data['macros']['protein']['value'],

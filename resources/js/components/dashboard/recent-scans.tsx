@@ -192,14 +192,7 @@ export default function RecentScans({
                                                         </span>
                                                     </div>
                                                 )}
-                                                {scan.analisis_ai && (
-                                                    <p className="mt-2.5 rounded-r-xl border-l-2 border-amber-500 bg-amber-500/5 py-1.5 pl-2.5 pr-2 text-[10px] font-semibold leading-relaxed italic text-slate-650 dark:text-neutral-350">
-                                                        <strong className="mr-1 text-[8px] font-black tracking-wider text-amber-600 uppercase dark:text-amber-450">
-                                                            Saran:
-                                                        </strong>
-                                                        {scan.analisis_ai}
-                                                    </p>
-                                                )}
+
                                             </div>
                                         </div>
 
