@@ -21,58 +21,57 @@ export default function PromoFeatures() {
                     <div className="group cursor-pointer rounded-3xl border border-slate-100/80 bg-slate-50/50 p-6 transition hover:border-amber-400 dark:border-neutral-900 dark:bg-neutral-900/30 dark:hover:border-amber-500">
                         <div className="dark:border-neutral-855 relative mb-6 aspect-[4/3] overflow-hidden rounded-2xl border border-slate-50 shadow-md">
                             <img
-                                src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400"
+                                src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=400"
                                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 alt="Promo 1"
                             />
                             <div className="dark:text-amber-455 absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1 text-[9px] font-black text-amber-600 backdrop-blur-md dark:bg-neutral-900/90">
-                                PREMIUM
+                                AI SCAN
                             </div>
                         </div>
                         <h3 className="mb-2 text-lg font-black tracking-tight text-slate-800 uppercase italic transition group-hover:text-amber-600 dark:text-white dark:group-hover:text-amber-400">
-                            Deteksi Makro Akurat
+                            Deteksi Menu Populer
                         </h3>
                         <p className="text-slate-550 text-xs leading-relaxed font-semibold dark:text-neutral-400">
-                            Gunakan algoritma terbaru kami untuk mendapatkan
-                            detail nutrisi yang lebih presisi pada setiap gigitan makanan sehari-hari.
+                            Pindai menu hidangan dari KFC, McDonald's, dan Burger King secara instan untuk mendapatkan estimasi nilai gizi yang akurat.
                         </p>
                     </div>
 
                     <div className="group cursor-pointer rounded-3xl border border-slate-100/80 bg-slate-50/50 p-6 transition hover:border-amber-400 dark:border-neutral-900 dark:bg-neutral-900/30 dark:hover:border-amber-500">
                         <div className="dark:border-neutral-855 relative mb-6 aspect-[4/3] overflow-hidden rounded-2xl border border-slate-50 shadow-md">
                             <img
-                                src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400"
+                                src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400"
                                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 alt="Promo 2"
                             />
                             <div className="absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1 text-[9px] font-black text-blue-600 backdrop-blur-md dark:bg-neutral-900/90 dark:text-blue-400">
-                                NEW FEATURE
+                                INTERACTIVE
                             </div>
                         </div>
                         <h3 className="mb-2 text-lg font-black tracking-tight text-slate-800 uppercase italic transition group-hover:text-amber-600 dark:text-white dark:group-hover:text-amber-400">
-                            Mode Diet Khusus
+                            Tanya AI Chatbot
                         </h3>
                         <p className="text-slate-550 text-xs leading-relaxed font-semibold dark:text-neutral-400">
-                            Sesuaikan filter pencarian berdasarkan preferensi diet Keto, Vegan, atau Intermittent Fasting yang sesuai jadwal Anda.
+                            Konsultasikan asupan gizi, tips defisit kalori, hingga rekomendasi olahraga pembakar energi langsung dengan asisten NutriBot.
                         </p>
                     </div>
 
                     <div className="group cursor-pointer rounded-3xl border border-slate-100/80 bg-slate-50/50 p-6 transition hover:border-amber-400 dark:border-neutral-900 dark:bg-neutral-900/30 dark:hover:border-amber-500">
                         <div className="dark:border-neutral-855 relative mb-6 aspect-[4/3] overflow-hidden rounded-2xl border border-slate-50 shadow-md">
                             <img
-                                src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400"
+                                src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400"
                                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 alt="Promo 3"
                             />
                             <div className="dark:text-green-455 absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1 text-[9px] font-black text-green-600 backdrop-blur-md dark:bg-neutral-900/90">
-                                SYNCED
+                                REAL-TIME
                             </div>
                         </div>
                         <h3 className="mb-2 text-lg font-black tracking-tight text-slate-800 uppercase italic transition group-hover:text-amber-600 dark:text-white dark:group-hover:text-amber-400">
-                            Dashboard Real-time
+                            Dashboard & Tracker
                         </h3>
                         <p className="text-slate-550 text-xs leading-relaxed font-semibold dark:text-neutral-400">
-                            Data Anda tersimpan secara aman di database Laravel Anda dan dapat diakses dari perangkat mana pun secara instan.
+                            Pantau akumulasi energi harian (kalori) serta keseimbangan protein, karbohidrat, dan lemak Anda secara dinamis.
                         </p>
                     </div>
                 </div>

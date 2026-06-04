@@ -7,7 +7,7 @@ export default function FaqAccordion() {
     const faqItems = [
         {
             q: 'Bagaimana cara kerja deteksi makanan berbasis AI pada Nutrivision?',
-            a: 'Nutrivision menggunakan teknologi pengenalan gambar berbasis kecerdasan buatan (AI) yang diintegrasikan dengan basis data kandungan gizi pangan Indonesia. Sistem akan menganalisis foto makanan yang diunggah untuk mengidentifikasi jenis makanan dan mengestimasi nilai nutrisinya secara instan.',
+            a: 'Nutrivision menggunakan teknologi pengenalan gambar berbasis kecerdasan buatan (AI) yang diintegrasikan dengan basis data kandungan gizi menu restoran cepat saji populer (KFC, McDonald\'s, dan Burger King). Sistem akan menganalisis foto makanan yang diunggah untuk mengidentifikasi jenis hidangan dan menampilkan rincian kalori serta makronutrisi secara instan.',
         },
         {
             q: 'Seberapa akurat estimasi kalori dan nutrisi yang diberikan?',

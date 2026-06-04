@@ -77,16 +77,16 @@ export default function NutritionInsight() {
                         <div className="relative z-10 mx-auto max-w-sm rounded-[3rem] border border-slate-100 bg-white p-8 shadow-xl sm:max-w-md dark:border-neutral-900 dark:bg-neutral-900">
                             <div className="mb-6 flex items-center gap-4">
                                 <img
-                                    src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=120"
+                                    src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=120"
                                     className="border-slate-105 h-16 w-16 rounded-2xl border object-cover shadow-md dark:border-neutral-800"
                                     alt="Scan Detail Preview"
                                 />
                                 <div>
                                     <h5 className="text-base font-black tracking-tighter text-slate-800 uppercase italic sm:text-lg dark:text-white">
-                                        Salad Bowl Deluxe
+                                        Whopper Burger
                                     </h5>
-                                    <span className="text-[10px] font-bold tracking-widest text-green-500 uppercase dark:text-green-400">
-                                        Healthy Choice Detected
+                                    <span className="text-[10px] font-bold tracking-widest text-amber-500 uppercase dark:text-amber-400">
+                                        Burger King Detected
                                     </span>
                                 </div>
                             </div>
@@ -94,14 +94,28 @@ export default function NutritionInsight() {
                                 <div className="space-y-1">
                                     <div className="flex items-end justify-between">
                                         <span className="text-[9px] font-black text-slate-400 uppercase dark:text-neutral-500">
-                                            PROTEIN
+                                            KALORI
                                         </span>
                                         <span className="text-xs font-black text-slate-700 dark:text-neutral-300">
-                                            18g
+                                            678 kkal
                                         </span>
                                     </div>
                                     <div className="h-1.5 overflow-hidden rounded-full border border-slate-100 bg-slate-50 dark:border-neutral-800 dark:bg-neutral-950">
-                                        <div className="h-full w-[30%] rounded-full bg-blue-500"></div>
+                                        <div className="h-full w-[34%] rounded-full bg-rose-500"></div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <div className="flex items-end justify-between">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase dark:text-neutral-500">
+                                            PROTEIN
+                                        </span>
+                                        <span className="text-xs font-black text-slate-700 dark:text-neutral-300">
+                                            30g
+                                        </span>
+                                    </div>
+                                    <div className="h-1.5 overflow-hidden rounded-full border border-slate-100 bg-slate-50 dark:border-neutral-800 dark:bg-neutral-950">
+                                        <div className="h-full w-[60%] rounded-full bg-blue-500"></div>
                                     </div>
                                 </div>
 
@@ -111,11 +125,11 @@ export default function NutritionInsight() {
                                             KARBOHIDRAT
                                         </span>
                                         <span className="text-xs font-black text-slate-700 dark:text-neutral-300">
-                                            28g
+                                            51g
                                         </span>
                                     </div>
                                     <div className="h-1.5 overflow-hidden rounded-full border border-slate-100 bg-slate-50 dark:border-neutral-800 dark:bg-neutral-950">
-                                        <div className="h-full w-[10%] rounded-full bg-indigo-500"></div>
+                                        <div className="h-full w-[35%] rounded-full bg-indigo-500"></div>
                                     </div>
                                 </div>
 
@@ -125,19 +139,17 @@ export default function NutritionInsight() {
                                             LEMAK
                                         </span>
                                         <span className="text-xs font-black text-slate-700 dark:text-neutral-300">
-                                            12g
+                                            38g
                                         </span>
                                     </div>
                                     <div className="h-1.5 overflow-hidden rounded-full border border-slate-100 bg-slate-50 dark:border-neutral-800 dark:bg-neutral-950">
-                                        <div className="h-full w-[18%] rounded-full bg-amber-500"></div>
+                                        <div className="h-full w-[58%] rounded-full bg-amber-500"></div>
                                     </div>
                                 </div>
                             </div>
                             <div className="mt-8 border-t border-slate-100 pt-6 dark:border-neutral-800">
                                 <div className="dark:bg-neutral-955 text-slate-550 rounded-2xl bg-slate-50 p-4 text-[10px] leading-relaxed font-semibold italic dark:text-neutral-400">
-                                    "AI menyarankan untuk menambahkan segelas
-                                    air lemon untuk membantu penyerapan zat besi
-                                    dari sayuran hijau ini harian Anda."
+                                    "Whopper Burger mengandung kalori dan lemak yang cukup tinggi. AI menyarankan untuk membatasi makanan berminyak di sisa hari ini serta mengimbangi dengan jalan kaki 45 menit."
                                 </div>
                             </div>
                         </div>
