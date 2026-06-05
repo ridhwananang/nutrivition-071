@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class ScanResource extends JsonResource
 {
@@ -14,7 +15,7 @@ class ScanResource extends JsonResource
             'user_id'        => $this->user_id,
             'nutrition_id'   => $this->nutrition_id,
             'scan_image'     => $this->scan_image,
-            'scan_image_url' => $this->scan_image ? asset('storage/' . $this->scan_image) : null,
+            'scan_image_url' => $this->scan_image ? Storage::disk(config('filesystems.default') === 'local' ? 'public' : config('filesystems.default'))->url($this->scan_image) : null,
             'analisis_ai'    => $this->analisis_ai,
             'confidence'     => (float) $this->confidence,
             'serving_qty'    => (float) $this->serving_qty,

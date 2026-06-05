@@ -159,12 +159,18 @@ class FileScanRepository implements ScanRepositoryInterface
 
         // Hapus berkas fisik foto scan jika ada
         if (!empty($scan->scan_image)) {
-            $physicalPath = public_path('storage/' . $scan->scan_image);
-            if (file_exists($physicalPath)) {
-                @unlink($physicalPath);
+            $defaultDisk = config('filesystems.default');
+            $disk = $defaultDisk === 'local' ? 'public' : $defaultDisk;
+
+            if (Storage::disk($disk)->exists($scan->scan_image)) {
+                Storage::disk($disk)->delete($scan->scan_image);
             }
             if (Storage::disk('public')->exists($scan->scan_image)) {
                 Storage::disk('public')->delete($scan->scan_image);
+            }
+            $physicalPath = public_path('storage/' . $scan->scan_image);
+            if (file_exists($physicalPath)) {
+                @unlink($physicalPath);
             }
         }
 

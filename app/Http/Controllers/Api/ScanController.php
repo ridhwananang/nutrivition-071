@@ -9,6 +9,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class ScanController extends Controller
 {
@@ -37,9 +38,9 @@ class ScanController extends Controller
         }
 
         $file = $request->file('image');
-        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('storage/scans'), $fileName);
-        $path = 'scans/' . $fileName;
+        $defaultDisk = config('filesystems.default');
+        $disk = $defaultDisk === 'local' ? 'public' : $defaultDisk;
+        $path = Storage::disk($disk)->putFile('scans', $file, 'public');
 
         $createdResults = [];
         $savedNutritionItems = [];

@@ -53,12 +53,18 @@ class EloquentScanRepository implements ScanRepositoryInterface
 
         // Hapus berkas fisik scan jika ada
         if ($result->scan_image) {
-            $physicalPath = public_path('storage/' . $result->scan_image);
-            if (file_exists($physicalPath)) {
-                @unlink($physicalPath);
+            $defaultDisk = config('filesystems.default');
+            $disk = $defaultDisk === 'local' ? 'public' : $defaultDisk;
+
+            if (Storage::disk($disk)->exists($result->scan_image)) {
+                Storage::disk($disk)->delete($result->scan_image);
             }
             if (Storage::disk('public')->exists($result->scan_image)) {
                 Storage::disk('public')->delete($result->scan_image);
+            }
+            $physicalPath = public_path('storage/' . $result->scan_image);
+            if (file_exists($physicalPath)) {
+                @unlink($physicalPath);
             }
         }
 

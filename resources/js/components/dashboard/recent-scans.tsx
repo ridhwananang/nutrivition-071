@@ -4,6 +4,7 @@ import { Utensils, Apple, Trash2 } from 'lucide-react';
 interface ScanItem {
     id: number;
     scan_image: string | null;
+    scan_image_url?: string | null;
     meal_type: string;
     serving_qty: number;
     confidence: number;
@@ -105,7 +106,7 @@ export default function RecentScans({
                                             <div className="dark:border-neutral-850 flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-50 dark:bg-neutral-900">
                                                 {scan.scan_image ? (
                                                     <img
-                                                        src={`/storage/${scan.scan_image}`}
+                                                        src={scan.scan_image_url || `/storage/${scan.scan_image}`}
                                                         alt={
                                                             scan.nutrition
                                                                 ?.item || 'Food'
