@@ -45,7 +45,7 @@ export default function Navbar({
     };
 
     return (
-        <nav className="sticky top-0 z-50 border-b border-slate-100 dark:border-neutral-900 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-lg">
+        <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-100 dark:border-neutral-900 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-lg">
             <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
                 {/* Brand Logo inside ApplicationLogo */}
                 <div

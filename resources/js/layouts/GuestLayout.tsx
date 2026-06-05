@@ -29,7 +29,7 @@ export default function GuestLayout({
         <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#FCFCFC] font-sans text-slate-950 selection:bg-amber-500 selection:text-white dark:bg-neutral-950 dark:text-white">
             {/* Header / Navigation system */}
             {minimal ? (
-                <header className="sticky top-0 z-50 flex h-20 items-center justify-between border-b border-slate-100 bg-white/90 px-6 backdrop-blur-lg sm:px-12 dark:border-neutral-900 dark:bg-neutral-950/90">
+                <header className="fixed top-0 left-0 right-0 z-50 flex h-20 items-center justify-between border-b border-slate-100 bg-white/90 px-6 backdrop-blur-lg sm:px-12 dark:border-neutral-900 dark:bg-neutral-950/90">
                     <Link href="/" className="cursor-pointer">
                         <ApplicationLogo />
                     </Link>
@@ -50,7 +50,7 @@ export default function GuestLayout({
             )}
 
             {/* Main Application Page Frame */}
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 pt-20">{children}</main>
 
             {/* Shared Footer block following Indonesia localization */}
             {minimal ? (
